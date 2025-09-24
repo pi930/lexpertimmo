@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact – Lexpertimmo</title>
+  <style>
+    body {
+      background-color: white;
+      font-family: Arial, sans-serif;
+      color: #333;
+      margin: 40px;
+    }
+
+    h2 {
+      color: #0033cc; /* Bleu Lexpertimmo */
+    }
+
+    form {
+      border: 2px solid #0033cc;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: auto;
+      background-color: #fff;
+    }
+
+    label {
+      font-weight: bold;
+      color: #cc0000; /* Rouge Lexpertimmo */
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #cc0000;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #a80000;
+    }
+
+    .confirmation {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e6f2ff;
+      border-left: 5px solid #0033cc;
+      color: #0033cc;
+    }
+  </style>
+</head>
+<body>
+       @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+
+  <h2>Contactez Lexpertimmo</h2>
+
+  <p><strong>Adresse de l'agence :</strong><br>
+  12 Rue des Frères Lumière<br>
+  06400 Cannes, France</p>
+
+  <form method="POST" action="{{ route('contact.send') }}" id="contactForm">
+    @csrf
+
+    <label for="nom">Nom :</label>
+    <input type="text" id="nom" name="nom" value="Pierrard Dupont" required>
+
+    <label for="email">Email :</label>
+    <input type="email" id="email" name="email" value="pierrard@lexpertimmo.fr" required>
+
+    <label for="telephone">Téléphone :</label>
+    <input type="tel" id="telephone" name="telephone" value="+33 6 12 34 56 78">
+
+    <label for="rue">Rue :</label>
+    <input type="text" id="rue" name="rue" placeholder="12 Rue des Frères Lumière" required>
+
+    <label for="code_postal">Code postal :</label>
+    <input type="text" id="code_postal" name="code_postal" placeholder="06400" required>
+
+    <label for="ville">Ville :</label>
+    <input type="text" id="ville" name="ville" placeholder="Cannes" required>
+
+    <label for="pays">Pays :</label>
+    <input type="text" id="pays" name="pays" value="France" required>
+
+    <label for="sujet">Sujet :</label>
+    <input type="text" id="sujet" name="sujet" value="Demande d'information sur un bien immobilier">
+
+    <label for="message">Message :</label>
+    <textarea id="message" name="message" rows="5">Bonjour, je suis intéressé par le bien situé à Cannes. Pourriez-vous m'envoyer plus d'informations ? Merci !</textarea>
+
+    <button type="submit">Envoyer</button>
+</form>
+</body>
+</html>
