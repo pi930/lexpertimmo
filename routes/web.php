@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ContactController;
-
+use App\Http\Controllers\DevisController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,3 +25,5 @@ Route::get('/test-db', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/messages', [ContactController::class, 'index'])->name('admin.messages');
 });
+Route::get('/devis/generer-apres-login', [DevisController::class, 'genererApresLogin'])->name('devis.genererApresLogin');
+

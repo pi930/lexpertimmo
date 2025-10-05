@@ -68,6 +68,7 @@
     <div class="alert alert-success">
         {{ session('success') }}
     </div>
+@endif
 
   <h2>Contactez Lexpertimmo</h2>
 
@@ -77,6 +78,11 @@
 
   <form method="POST" action="{{ route('contact.send') }}" id="contactForm">
     @csrf
+    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 
     <label for="nom">Nom :</label>
     <input type="text" id="nom" name="nom" value="Pierrard Dupont" required>
