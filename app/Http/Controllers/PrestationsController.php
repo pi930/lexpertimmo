@@ -10,7 +10,7 @@ class PrestationsController extends Controller
     public function index()
     {
         $prestations = Prestation::all();
-        return view('prestations.index', compact('prestations'));
+        return view('prestations', compact('prestations'));
     }
 
     // ✅ Enregistre les prestations sélectionnées dans la session

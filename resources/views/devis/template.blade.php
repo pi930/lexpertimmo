@@ -32,11 +32,14 @@
                 @foreach($prestations as $prestation)
                     <tr>
                         <td>{{ $prestation['nom'] ?? 'Non spécifié' }}</td>
-                        <td>{{ number_format($prestation['prix'], 2, ',', ' ') }}</td>
+                        <td>{{ number_format($prixTotal, 2, ',', ' ') }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
+    <h2>Résumé du devis</h2>
+<p><strong>Type de bien :</strong> {{ $typeBien ?? 'Non spécifié' }}</p>
+<p><strong>Surface :</strong> {{ $surface ?? 'Non spécifiée' }}</p>
 </body>
 </html>

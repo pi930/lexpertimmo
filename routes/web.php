@@ -1,29 +1,24 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\DevisController;
+
+Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
+Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
+
 
 Route::get('/', function () {
     return view('welcome');
 });
-// Affiche le formulaire
-Route::get('/contact', function () {
-    return view('contact');
-});
 
-// Traite le formulaire
-Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
-
-
-Route::get('/test-db', function () {
-    $sessions = DB::table('sessions')->get();
-    return response()->json($sessions);
-});
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/messages', [ContactController::class, 'index'])->name('admin.messages');
+    // Route admin des messages reçus
+    Route::get('/admin/contact', [ContactController::class, 'index'])->name('admin.contact.index');
 });
-Route::get('/devis/generer-apres-login', [DevisController::class, 'genererApresLogin'])->name('devis.genererApresLogin');
 
+require __DIR__.'/auth.php';

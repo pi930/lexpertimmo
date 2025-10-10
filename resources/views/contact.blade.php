@@ -78,12 +78,6 @@
 
   <form method="POST" action="{{ route('contact.send') }}" id="contactForm">
     @csrf
-    @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
-
     <label for="nom">Nom :</label>
     <input type="text" id="nom" name="nom" value="Pierrard Dupont" required>
 
@@ -112,6 +106,8 @@
     <textarea id="message" name="message" rows="5">Bonjour, je suis intéressé par le bien situé à Cannes. Pourriez-vous m'envoyer plus d'informations ? Merci !</textarea>
 
     <button type="submit">Envoyer</button>
+
+
 </form>
 </body>
 </html>

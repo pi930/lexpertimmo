@@ -16,15 +16,14 @@ return new class extends Migration
 
             // 🔐 Lien avec l'utilisateur
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('reference')->unique()->nullable();
+
 
             // 📄 Fichier PDF stocké
             $table->string('pdf_path');
 
             // 💰 Montant total TTC
             $table->decimal('total_ttc', 10, 2);
-
-            // 📆 Date de création
-            $table->timestamp('created_at')->useCurrent();
 
             // ⏳ Expiration (optionnel)
             $table->timestamp('expires_at')->nullable();
@@ -41,6 +40,8 @@ return new class extends Migration
             $table->text('message')->nullable();
 
             $table->timestamps();
+            $table->index(['user_id', 'status']);
+
         });
     }
 

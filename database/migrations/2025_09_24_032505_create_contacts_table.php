@@ -11,20 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-       
         Schema::create('contacts', function (Blueprint $table) {
-    $table->id();
-    $table->string('nom');
-    $table->string('email');
-    $table->string('telephone')->nullable();
-    $table->string('rue');
-    $table->string('code_postal');
-    $table->string('ville');
-    $table->string('pays');
-    $table->string('sujet');
-    $table->text('message');
-    $table->timestamps();
-});
+            $table->id();
+            $table->string('nom');
+            $table->string('email');
+            $table->string('telephone')->nullable();
+            $table->string('rue');
+            $table->string('code_postal');
+            $table->string('ville');
+            $table->string('pays');
+            $table->string('sujet');
+            $table->text('message');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->timestamps();
+        });
     }
 
     /**

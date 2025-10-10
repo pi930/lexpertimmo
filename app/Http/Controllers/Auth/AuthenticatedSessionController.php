@@ -44,14 +44,4 @@ class AuthenticatedSessionController extends Controller
 
         return redirect('/');
     }
-    protected function authenticated(Request $request, $user)
-{
-    // 🔁 Redirection personnalisée après login
-    if ($request->session()->has('redirect_after_login')) {
-        return redirect()->route($request->session()->get('redirect_after_login'));
-    }
-
-    // 🚀 Redirection vers la page "Prise de rendez-vous"
-    return redirect()->route('rendezvous.index');
-}
 }
