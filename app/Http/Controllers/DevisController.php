@@ -11,7 +11,34 @@ use App\Models\Devis;
 use App\Mail\DevisCree;
 
 class DevisController extends Controller
+{   private function calculerPrix($typeBien, $surface, $options)
 {
+    $basePrix = match([$typeBien, $surface]) {             ['vente', '<50m²'] => 290,
+            ['vente', '<100m²'] => 390,
+            ['vente', '<150m²'] => 470,
+            ['vente', '<200m²'] => 550,
+            ['location', '<50m²'] => 269,
+            ['location', '<100m²'] => 350,
+            ['location', '<150m²'] => 450,
+            ['location', '<200m²'] => 490,
+ };
+    foreach ($options as $option) {
+        $basePrix += match($option) { 'gaz_cuisson' => 40,
+                'gaz_chaudiere' => $typeBien === 'vente' ? 50 : 30,
+                'plomb' => match($surface) {
+                    '<50m²' => 50,
+                    '<100m²' => $typeBien === 'vente' ? 90 : 80,
+                    '<150m²' => $typeBien === 'vente' ? 130 : 110,
+                    '<200m²' => $typeBien === 'vente' ? 170 : 140,
+                },
+                'zone_non_habitable_50' => 70,
+                'zone_non_habitable_100' => 100,
+                'zone_non_habitable_150' => 130,
+                'zone_non_habitable_200' => 160,
+                default => 0, };
+    }
+    return $basePrix;
+}
     public function calculer(Request $request)
     {
         // Validation des champs
@@ -25,38 +52,9 @@ class DevisController extends Controller
         $surface = $request->input('surface');
         $options = $request->input('options', []);
 
+        $prixTotal = $this->calculerPrix($typeBien, $surface, $options);
+
         // Prix de base selon type de bien et surface
-        $basePrix = match([$typeBien, $surface]) {
-            ['vente', '<50m²'] => 290,
-            ['vente', '<100m²'] => 390,
-            ['vente', '<150m²'] => 470,
-            ['vente', '<200m²'] => 550,
-            ['location', '<50m²'] => 269,
-            ['location', '<100m²'] => 350,
-            ['location', '<150m²'] => 450,
-            ['location', '<200m²'] => 490,
-        };
-
-        $prixTotal = $basePrix;
-
-        // Ajout des prestations supplémentaires
-        foreach ($options as $option) {
-            $prixTotal += match($option) {
-                'gaz_cuisson' => 40,
-                'gaz_chaudiere' => $typeBien === 'vente' ? 50 : 30,
-                'plomb' => match($surface) {
-                    '<50m²' => 50,
-                    '<100m²' => $typeBien === 'vente' ? 90 : 80,
-                    '<150m²' => $typeBien === 'vente' ? 130 : 110,
-                    '<200m²' => $typeBien === 'vente' ? 170 : 140,
-                },
-                'zone_non_habitable_50' => 70,
-                'zone_non_habitable_100' => 100,
-                'zone_non_habitable_150' => 130,
-                'zone_non_habitable_200' => 160,
-                default => 0,
-            };
-        }
 
         // Stockage temporaire pour génération PDF
         session([
@@ -70,7 +68,8 @@ class DevisController extends Controller
     }
 
     public function generer(Request $request)
-    {
+    {  
+
         // 🔐 Vérification d'authentification
         if (!Auth::check()) {
             return redirect()->route('login')->with('redirect_after_login', 'devis');
@@ -83,6 +82,10 @@ class DevisController extends Controller
         $surface = session('surface');
         $options = session('options', []);
         $prixTotal = session('prixTotal');
+        
+        if (!$typeBien || !$surface || !$prixTotal) {
+    return redirect()->route('devis.calcul')->with('error', 'Session expirée, veuillez recalculer votre devis.');
+}
 
         // Formatage des prestations pour le PDF
         $prestations = collect($options)->map(function ($opt) use ($typeBien, $surface) {
@@ -112,19 +115,22 @@ class DevisController extends Controller
         Storage::put("devis/$filename", $pdf->output());
 
         // 🗂️ Enregistrement en base
-        $devis = Devis::create([
-            'user_id' => $user->id,
-            'pdf_path' => "devis/$filename",
-            'total_ttc' => $prixTotal,
-            'status' => 'en attente',
-           
-        ]);
+      $devis = Devis::create([
+    'user_id' => $user->id,
+    'pdf_path' => "devis/$filename",
+    'total_ttc' => $prixTotal,
+    'status' => 'en attente',
+    'nom' => $user->name,
+    'email' => $user->email,
+    'objet' => "Devis {$typeBien} - {$surface}",
+    'montant' => $prixTotal,
+]);
 
         // 📧 Envoi du mail
         Mail::to($user->email)->send(new DevisCree($devis));
 
         // ✅ Redirection
-       return redirect()->route('dashboard')->with([
+    return redirect()->route($user->is_admin ? 'admin.dashboard' : 'user.dashboard')->with([
     'success' => 'Votre devis a été créé et envoyé !',
     'devis_link' => Storage::url("devis/$filename")
 ]);

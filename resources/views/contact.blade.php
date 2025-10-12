@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -64,11 +63,6 @@
   </style>
 </head>
 <body>
-       @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
 
   <h2>Contactez Lexpertimmo</h2>
 
@@ -76,28 +70,24 @@
   12 Rue des Frères Lumière<br>
   06400 Cannes, France</p>
 
-  <form method="POST" action="{{ route('contact.send') }}" id="contactForm">
-    @csrf
+  <form id="contactForm" method="POST" action="{{ route('contact.send') }}">
+  @csrf
     <label for="nom">Nom :</label>
     <input type="text" id="nom" name="nom" value="Pierrard Dupont" required>
+ <label for="rue">Rue :</label>
+<input type="text" id="rue" name="rue" required>
+
+<label for="ville">Ville :</label>
+<input type="text" id="ville" name="ville" required>
+
+<label for="code_postal">Code postal :</label>
+<input type="text" id="code_postal" name="code_postal" required>
 
     <label for="email">Email :</label>
     <input type="email" id="email" name="email" value="pierrard@lexpertimmo.fr" required>
 
     <label for="telephone">Téléphone :</label>
     <input type="tel" id="telephone" name="telephone" value="+33 6 12 34 56 78">
-
-    <label for="rue">Rue :</label>
-    <input type="text" id="rue" name="rue" placeholder="12 Rue des Frères Lumière" required>
-
-    <label for="code_postal">Code postal :</label>
-    <input type="text" id="code_postal" name="code_postal" placeholder="06400" required>
-
-    <label for="ville">Ville :</label>
-    <input type="text" id="ville" name="ville" placeholder="Cannes" required>
-
-    <label for="pays">Pays :</label>
-    <input type="text" id="pays" name="pays" value="France" required>
 
     <label for="sujet">Sujet :</label>
     <input type="text" id="sujet" name="sujet" value="Demande d'information sur un bien immobilier">
@@ -106,8 +96,22 @@
     <textarea id="message" name="message" rows="5">Bonjour, je suis intéressé par le bien situé à Cannes. Pourriez-vous m'envoyer plus d'informations ? Merci !</textarea>
 
     <button type="submit">Envoyer</button>
+  </form>
 
+  <div class="confirmation" id="confirmationMessage">
+    ✅ Merci Pierrard ! Votre message a bien été envoyé. Nous vous répondrons dans les plus brefs délais.
+  </div>
 
-</form>
+  <script>
+    const form = document.getElementById('contactForm');
+    const confirmation = document.getElementById('confirmationMessage');
+
+    form.addEventListener('submit', function(e) {
+
+      confirmation.style.display = 'block';
+      form.reset(); // Réinitialise le formulaire
+    });
+  </script>
+
 </body>
 </html>
