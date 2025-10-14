@@ -25,7 +25,7 @@ public function showUser($id)
         abort(403);
     }
 
-    $user = User::findOrFail($id);
+    $user = User::with(['coordonnee', 'contacts', 'devis', 'rendezvous'])->findOrFail($id);
     $coordonnees = Coordonnee::where('user_id', $id)->first();
     $messages = Contact::where('user_id', $id)->get();
     $devis = Devis::where('user_id', $id)->get();

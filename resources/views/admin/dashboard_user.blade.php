@@ -3,6 +3,10 @@
     <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
       {{ __('Aperçu du compte : ') }} {{ $user->name }}
     </h2>
+    <h2>{{ $user->nom }}</h2>
+<p>Email : {{ $user->email }}</p>
+<p>Téléphone : {{ $coordonnees->telephone ?? 'Non renseigné' }}</p>
+<p>Adresse : {{ $coordonnees->rue ?? '' }} {{ $coordonnees->code_postal ?? '' }} {{ $coordonnees->ville ?? '' }}</p>
   </x-slot>
 
   <div class="py-12 space-y-6">

@@ -9,7 +9,8 @@ div class="space-y-6">
                         <th class="px-4 py-2">Nom</th>
                         <th class="px-4 py-2">Email</th>
                         <th class="px-4 py-2">Téléphone</th>
-                        <th class="px-4 py-2">Adresse</th>
+                        <th class="px-4 py-2">rue</th>
+                        <th class="px-4 py-2">code_postale</th>
                         <th class="px-4 py-2">Ville</th>
                         <th class="px-4 py-2">Date</th>
                     </tr>

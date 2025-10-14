@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,16 +17,34 @@ class User extends Authenticatable
     }
 
     protected $fillable = [
-        'name',
+        'nom',
+        'rue',
+        'code_postal',
+        'ville',
         'email',
+        'phone',
         'password',
-        'role', // 👈 à ajouter si tu veux pouvoir le remplir via formulaire ou factory
+        'role',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
+public function contacts()
+{
+    return $this->hasMany(Contact::class);
+}
+
+public function devis()
+{
+    return $this->hasMany(Devis::class);
+}
+
+public function rendezvous()
+{
+    return $this->hasMany(RendezVous::class);
+}
 
     protected function casts(): array
     {

@@ -24,29 +24,15 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($messages as $contact)
-                    <tr>
-                        <td>{{ $contact->id }}</td>
-                        <td>{{ $contact->nom }}</td>
-                        <td>{{ $contact->email }}</td>
-                        <td>{{ $contact->telephone ?? '—' }}</td>
-                        <td>
-                            {{ $contact->rue }}<br>
-                            {{ $contact->code_postal }} {{ $contact->ville }}<br>
-                            {{ $contact->pays }}
-                        </td>
-                        <td>{{ $contact->sujet }}</td>
-                        <td>{{ Str::limit($contact->message, 100) }}</td>
-                        <td>{{ $contact->created_at->format('d/m/Y H:i') }}</td>
-                        <td>
-                            @if($contact->user_id)
-                                <span class="badge bg-success">#{{ $contact->user_id }}</span>
-                            @else
-                                <span class="badge bg-secondary">Invité</span>
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
+              @foreach($messages as $msg)
+    <tr>
+        <td>{{ $msg->nom }}</td>
+        <td>{{ $msg->email }}</td>
+        <td>{{ $msg->sujet }}</td>
+        <td>{{ $msg->message }}</td>
+        <td>{{ $msg->created_at->format('d/m/Y H:i') }}</td>
+    </tr>
+@endforeach
             </tbody>
         </table>
 

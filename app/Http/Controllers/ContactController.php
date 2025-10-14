@@ -9,7 +9,7 @@ use App\Models\Contact;
 
 class ContactController extends Controller
 {
-    public function show()
+    public function index()
     {
         return view('contact');
     }
@@ -25,19 +25,18 @@ public function send(Request $request)
     'rue' => 'required|string|max:255',
     'ville' => 'required|string|max:255',
     'code_postal' => 'required|string|max:10',
+    'pays' => 'required|string',
 ]);
 
     // Ajout de l'ID utilisateur si connecté
     if (Auth::check()) {
-        $validated['user_id'] = Auth::id();
 
         // Enregistrement du message
         Contact::create($validated);
 
         // Redirection selon le rôle
-        return Auth::user()->role === 'admin'
-            ? redirect('/admin/dashboard')->with('success', 'Message enregistré. Redirection vers le tableau de bord admin.')
-            : redirect('/dashboard')->with('success', 'Message enregistré. Redirection vers votre tableau de bord.');
+        return 
+            redirect('/dashboard')->with('success', 'Message enregistré. Redirection vers votre tableau de bord.');
     }
 
     // Si non connecté : enregistrement sans user_id
@@ -59,18 +58,18 @@ public function userMessages()
     // Affiche la vue avec les messages
     return view('dashboard.messages', [
         'messages' => $messages,
-        'isAdmin' => Auth::user()->is_admin,
     ]);
 }
-    // Accessible uniquement aux admins
-    public function index()
-    {
-        // Tu peux ajouter une vérification de rôle ici si besoin
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403);
-        }
-
-        $messages = Contact::latest()->paginate(20);
-        return view('admin.contact.index', compact('messages'));
+public function adminMessages()
+{
+    if (!Auth::check() || Auth::user()->role !== 'admin') {
+        abort(403);
     }
+
+    $messages = Contact::latest()->paginate(20);
+
+    return view('admin.contact.index', compact('messages'));
+}
+    // Accessible uniquement aux admins
+   
 }

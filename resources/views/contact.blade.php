@@ -70,7 +70,7 @@
   12 Rue des Frères Lumière<br>
   06400 Cannes, France</p>
 
-  <form id="contactForm" method="POST" action="{{ route('contact.send') }}">
+  <form method="POST" action="{{ route('contact.send') }}">
   @csrf
     <label for="nom">Nom :</label>
     <input type="text" id="nom" name="nom" value="Pierrard Dupont" required>
@@ -82,6 +82,8 @@
 
 <label for="code_postal">Code postal :</label>
 <input type="text" id="code_postal" name="code_postal" required>
+<label for="pays">Pays :</label>
+<input type="text" id="pays" name="pays" value="France" required>
 
     <label for="email">Email :</label>
     <input type="email" id="email" name="email" value="pierrard@lexpertimmo.fr" required>
@@ -98,20 +100,10 @@
     <button type="submit">Envoyer</button>
   </form>
 
-  <div class="confirmation" id="confirmationMessage">
-    ✅ Merci Pierrard ! Votre message a bien été envoyé. Nous vous répondrons dans les plus brefs délais.
+   <div class="confirmation" style="display: block;">
+    ✅ {{ session('success') }}
   </div>
 
-  <script>
-    const form = document.getElementById('contactForm');
-    const confirmation = document.getElementById('confirmationMessage');
-
-    form.addEventListener('submit', function(e) {
-
-      confirmation.style.display = 'block';
-      form.reset(); // Réinitialise le formulaire
-    });
-  </script>
 
 </body>
 </html>
