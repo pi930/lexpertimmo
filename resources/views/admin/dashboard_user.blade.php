@@ -1,33 +1,76 @@
 <x-app-layout>
-  <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-      {{ __('Aperçu du compte : ') }} {{ $user->name }}
-    </h2>
-    <h2>{{ $user->nom }}</h2>
-<p>Email : {{ $user->email }}</p>
-<p>Téléphone : {{ $coordonnees->telephone ?? 'Non renseigné' }}</p>
-<p>Adresse : {{ $coordonnees->rue ?? '' }} {{ $coordonnees->code_postal ?? '' }} {{ $coordonnees->ville ?? '' }}</p>
-  </x-slot>
+    @include('dashboard.menu')
 
-  <div class="py-12 space-y-6">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-      {{-- Coordonnées --}}
-      @include('dashboard.coordonnees', ['coordonnees' => $coordonnees])
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            🧑 Tableau de bord utilisateur
+        </h2>
+    </x-slot>
 
-      {{-- Messages --}}
-      @include('dashboard.messages', ['messages' => $messages])
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-      {{-- Devis --}}
-      @include('dashboard.devis', ['devis' => $devis])
+            {{-- Coordonnées --}}
+            <div id="coordonnees" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-bold mb-2">📍 Vos coordonnées</h3>
+                    <x-dashboard.coordonnees :coordonnees="$coordonnees" :isAdmin="false" :user="$user" />
+                </div>
+            </div>
 
-      {{-- Rendez-vous --}}
-      @include('dashboard.rendezvous', ['rendezvous' => $rendezvous])
+            {{-- Messages --}}
+            <div id="messages" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-bold mb-2">📬 Vos messages</h3>
+                    @forelse($messages as $message)
+                        <div class="mb-4 border-b pb-2">
+                            <p><strong>Sujet :</strong> {{ $message->sujet }}</p>
+                            <p><strong>Contenu :</strong> {{ $message->contenu }}</p>
+                            <p><strong>Envoyé le :</strong> {{ $message->created_at->format('d/m/Y H:i') }}</p>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">Aucun message pour le moment.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Devis --}}
+            <div id="devis" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-bold mb-2">📄 Vos devis</h3>
+                    @include('dashboard.devis', ['devis' => $devis, 'isAdmin' => false])
+                </div>
+            </div>
+
+            {{-- Rendez-vous --}}
+            <div id="rendezvous" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-bold mb-2">📅 Vos rendez-vous</h3>
+                    @forelse($rendezvous as $rdv)
+                        <div class="mb-4 border-b pb-2">
+                            <p><strong>Date :</strong> {{ $rdv->date->format('d/m/Y H:i') }}</p>
+                            <p><strong>Objet :</strong> {{ $rdv->objet }}</p>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">Aucun rendez-vous prévu.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Diagnostic final --}}
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-bold mb-2">🧪 Diagnostic final</h3>
+                    @if($diagnostic)
+                        <p><strong>Résumé :</strong> {{ $diagnostic->resume }}</p>
+                        <p><strong>Évaluation :</strong> {{ $diagnostic->evaluation }}</p>
+                        <p><strong>Date :</strong> {{ $diagnostic->created_at->format('d/m/Y') }}</p>
+                    @else
+                        <p class="text-gray-500">Aucun diagnostic disponible.</p>
+                    @endif
+                </div>
+            </div>
+
+        </div>
     </div>
-  </div>
-  <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 mt-10">
-  <a href="{{ route('admin.dashboard') }}"
-     class="inline-block bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800">
-    ← Retour au tableau de bord admin
-  </a>
-</div>
 </x-app-layout>

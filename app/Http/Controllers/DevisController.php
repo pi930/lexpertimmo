@@ -130,7 +130,8 @@ class DevisController extends Controller
         Mail::to($user->email)->send(new DevisCree($devis));
 
         // ✅ Redirection
-    return redirect()->route($user->is_admin ? 'admin.dashboard' : 'user.dashboard')->with([
+   return redirect()->route($user->role === 'admin' ? 'admin.dashboard' : 'user.dashboard');
+->with([
     'success' => 'Votre devis a été créé et envoyé !',
     'devis_link' => Storage::url("devis/$filename")
 ]);

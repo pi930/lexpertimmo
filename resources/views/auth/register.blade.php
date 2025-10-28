@@ -1,42 +1,68 @@
-div class="space-y-6">
-    <h2 class="text-2xl font-semibold">📍 Coordonnées des utilisateurs</h2>
+<div class="space-y-6">
+    <h2 class="text-2xl font-semibold">📝 Inscription utilisateur</h2>
 
-    @if($isAdmin)
-        @if($coordonnees->count())
-            <table class="table-auto w-full border">
-                <thead class="bg-gray-100 dark:bg-gray-800">
-                    <tr>
-                        <th class="px-4 py-2">Nom</th>
-                        <th class="px-4 py-2">Email</th>
-                        <th class="px-4 py-2">Téléphone</th>
-                        <th class="px-4 py-2">rue</th>
-                        <th class="px-4 py-2">code_postale</th>
-                        <th class="px-4 py-2">Ville</th>
-                        <th class="px-4 py-2">Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($coordonnees as $item)
-                        <tr class="border-t hover:bg-gray-100 cursor-pointer"
-                            onclick="window.location='{{ route('admin.dashboard.user', ['id' => $item->user_id]) }}'">
-                            <td class="px-4 py-2">{{ $item->nom }}</td>
-                            <td class="px-4 py-2">{{ $item->email }}</td>
-                            <td class="px-4 py-2">{{ $item->telephone }}</td>
-                            <td class="px-4 py-2">{{ $item->rue }} {{ $item->code_postal }}</td>
-                            <td class="px-4 py-2">{{ $item->ville }}</td>
-                            <td class="px-4 py-2">{{ $item->created_at->format('d/m/Y H:i') }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+        @csrf
 
-            <div class="mt-4">
-                {{ $coordonnees->links() }}
-            </div>
-        @else
-            <p class="text-gray-500">Aucune coordonnée enregistrée.</p>
-        @endif
-    @else
-        <p class="text-red-500">Accès réservé à l’administrateur.</p>
-    @endif
+        <!-- Nom -->
+        <div>
+            <label for="nom" class="block text-sm font-medium">Nom</label>
+            <input id="nom" name="nom" type="text" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Email -->
+        <div>
+            <label for="email" class="block text-sm font-medium">Email</label>
+            <input id="email" name="email" type="email" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Mot de passe -->
+        <div>
+            <label for="password" class="block text-sm font-medium">Mot de passe</label>
+            <input id="password" name="password" type="password" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Confirmation -->
+        <div>
+            <label for="password_confirmation" class="block text-sm font-medium">Confirmer le mot de passe</label>
+            <input id="password_confirmation" name="password_confirmation" type="password" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Rue -->
+        <div>
+            <label for="rue" class="block text-sm font-medium">Rue</label>
+            <input id="rue" name="rue" type="text" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Code postal -->
+        <div>
+            <label for="code_postale" class="block text-sm font-medium">Code postal</label>
+            <input id="code_postale" name="code_postale" type="text" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Ville -->
+        <div>
+            <label for="ville" class="block text-sm font-medium">Ville</label>
+            <input id="ville" name="ville" type="text" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Pays -->
+        <div>
+            <label for="pays" class="block text-sm font-medium">Pays</label>
+            <input id="pays" name="pays" type="text" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Téléphone -->
+        <div>
+            <label for="telephone" class="block text-sm font-medium">Téléphone</label>
+            <input id="telephone" name="telephone" type="text" required class="w-full border px-3 py-2 rounded">
+        </div>
+
+        <!-- Bouton -->
+        <div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                S’inscrire
+            </button>
+        </div>
+    </form>
 </div>

@@ -14,51 +14,16 @@ class ContactController extends Controller
         return view('contact');
     }
 
-public function send(Request $request)
-{
-  $validated = $request->validate([
-    'nom' => 'required|string|max:255',
-    'email' => 'required|email',
-    'telephone' => 'nullable|string|max:20',
-    'sujet' => 'nullable|string|max:255',
-    'message' => 'required|string|max:2000',
-    'rue' => 'required|string|max:255',
-    'ville' => 'required|string|max:255',
-    'code_postal' => 'required|string|max:10',
-    'pays' => 'required|string',
-]);
-
-    // Ajout de l'ID utilisateur si connecté
-    if (Auth::check()) {
-
-        // Enregistrement du message
-        Contact::create($validated);
-
-        // Redirection selon le rôle
-        return 
-            redirect('/dashboard')->with('success', 'Message enregistré. Redirection vers votre tableau de bord.');
-    }
-
-    // Si non connecté : enregistrement sans user_id
-    Contact::create($validated);
-    return redirect()->route('login')->with('success', 'Message enregistré. Veuillez vous connecter pour accéder à votre espace.');
-}   
+  
 public function userMessages()
 {
     // Vérifie que l'utilisateur est bien connecté
     if (!Auth::check()) {
         return redirect()->route('login')->with('error', 'Veuillez vous connecter pour accéder à vos messages.');
-    }
+    }   $messages = Contact::where('user_id', Auth::id())->latest()->paginate(10);
 
-    // Récupère les messages liés à l'utilisateur
-    $messages = Contact::where('user_id', Auth::id())
-                       ->latest()
-                       ->paginate(10);
+    return view('dashboard.messages', compact('messages'));
 
-    // Affiche la vue avec les messages
-    return view('dashboard.messages', [
-        'messages' => $messages,
-    ]);
 }
 public function adminMessages()
 {
@@ -68,7 +33,58 @@ public function adminMessages()
 
     $messages = Contact::latest()->paginate(20);
 
-    return view('admin.contact.index', compact('messages'));
+    return view('dashboard.messages', compact('messages'));
+}
+public function show(Contact $contact)
+{
+    return view('contact.show', compact('contact'));
+}
+public function contactform()
+{
+    $user = auth()->user();
+    $isAdmin = $user && $user->role === 'admin';
+
+    if ($isAdmin) {
+        // Côté admin : récupérer tous les utilisateurs avec leurs coordonnées
+        $coordonnees = \App\Models\User::paginate(10); // ou un scope si tu veux filtrer
+        $currentUser = null;
+    } else {
+        // Côté utilisateur : afficher ses propres coordonnées
+        $coordonnees = null;
+        $currentUser = $user;
+    }
+
+    return view('contact', [
+        'isAdmin' => $isAdmin,
+        'coordonnees' => $coordonnees,
+        'user' => $currentUser,
+    ]);
+}
+
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'nom' => 'required|string|max:255',
+        'rue' => 'required|string|max:255',
+        'ville' => 'required|string|max:255',
+        'code_postal' => 'required|string|max:20',
+        'pays' => 'required|string|max:100',
+        'email' => 'required|email|max:255',
+        'telephone' => 'nullable|string|max:20',
+        'sujet' => 'nullable|string|max:255',
+        'message' => 'nullable|string',
+    ]);
+
+    if (auth()->check()) {
+        $validated['user_id'] = auth()->id();
+    }
+
+    $contact = Contact::create($validated);
+
+    return redirect()->route('contact.form')->with([
+        'success' => 'Votre message a bien été envoyé.',
+        'contact_id' => $contact->id,
+    ]);
 }
     // Accessible uniquement aux admins
    

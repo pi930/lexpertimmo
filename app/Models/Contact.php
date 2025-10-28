@@ -9,4 +9,8 @@ class Contact extends Model
     protected $fillable = [
     'nom', 'email', 'telephone', 'rue', 'code_postal', 'ville', 'pays', 'sujet', 'message'
 ];
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
 }

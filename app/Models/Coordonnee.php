@@ -15,6 +15,7 @@ class Coordonnee extends Model
         'rue',
         'code_postal',
         'ville',
+        'pays',
         'email',
         'phone',
     ];
@@ -23,4 +24,5 @@ class Coordonnee extends Model
     {
         return $this->belongsTo(User::class);
     }
+
 }

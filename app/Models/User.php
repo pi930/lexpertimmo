@@ -13,7 +13,7 @@ class User extends Authenticatable
     // 🔐 Accesseur pour vérifier si l'utilisateur est admin
     public function getIsAdminAttribute()
     {
-        return $this->role === 'admin'; // ou 'is_admin' selon ta base
+        return $this->role === 'isAdmin'; // ou 'is_admin' selon ta base
     }
 
     protected $fillable = [
@@ -21,6 +21,7 @@ class User extends Authenticatable
         'rue',
         'code_postal',
         'ville',
+        'pays',
         'email',
         'phone',
         'password',
@@ -31,6 +32,11 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+public function coordonnee()
+{
+    return $this->hasOne(Coordonnee::class);
+}
+
 public function contacts()
 {
     return $this->hasMany(Contact::class);
@@ -53,4 +59,8 @@ public function rendezvous()
             'password' => 'hashed',
         ];
     }
+    public function notifications()
+{
+    return $this->hasMany(Notification::class, 'admin_id');
+}
 }
