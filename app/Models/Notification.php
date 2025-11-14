@@ -10,17 +10,17 @@ class Notification extends Model
     use HasFactory;
 
     protected $fillable = [
-        'admin_id',
+        'IsAdmin_id',
         'type',
         'content',
         'url',
         'read',
     ];
 
-    // 🔗 Relation avec l'admin (User)
-    public function admin()
+    // 🔗 Relation avec l'IsAdmin (User)
+    public function IsAdmin()
     {
-        return $this->belongsTo(User::class, 'admin_id');
+        return $this->belongsTo(User::class, 'IsAdmin_id');
     }
 
     // ✅ Scope pour récupérer les notifications non lues

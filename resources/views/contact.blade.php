@@ -69,7 +69,7 @@
 
     @if(session('contact_id'))
         <div class="mt-4">
-            <a href="{{ route('contact.show', session('contact_id')) }}" class="text-blue-600 hover:underline">
+            <a href="{{ route('user.contact', ['id' => session('contact_id')]) }}" class="text-blue-600 hover:underline">
                 Voir votre message envoyé
             </a>
         </div>

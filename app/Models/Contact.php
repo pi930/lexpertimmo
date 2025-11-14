@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Contact extends Model
 {
     protected $fillable = [
-    'nom', 'email', 'telephone', 'rue', 'code_postal', 'ville', 'pays', 'sujet', 'message'
-];
+        'nom', 'rue', 'ville', 'code_postal', 'pays',
+        'email', 'telephone', 'sujet', 'message', 'user_id'
+    ];
+
 public function user()
 {
     return $this->belongsTo(User::class);

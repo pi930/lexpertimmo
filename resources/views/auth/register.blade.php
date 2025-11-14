@@ -1,68 +1,60 @@
-<div class="space-y-6">
-    <h2 class="text-2xl font-semibold">📝 Inscription utilisateur</h2>
-
-    <form method="POST" action="{{ route('register') }}" class="space-y-4">
+<x-guest-layout>
+    <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        <!-- Nom -->
-        <div>
-            <label for="nom" class="block text-sm font-medium">Nom</label>
-            <input id="nom" name="nom" type="text" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Nom -->
+<x-input-label for="nom" :value="__('Nom')" />
+<x-text-input id="nom" name="nom" type="text" class="mt-1 block w-full" :value="old('nom')" required />
+<x-input-error :messages="$errors->get('nom')" class="mt-2 text-red-600" />
 
-        <!-- Email -->
-        <div>
-            <label for="email" class="block text-sm font-medium">Email</label>
-            <input id="email" name="email" type="email" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Email -->
+<x-input-label for="email" :value="__('Email')" />
+<x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required />
+<x-input-error :messages="$errors->get('email')" class="mt-2 text-red-600" />
 
-        <!-- Mot de passe -->
-        <div>
-            <label for="password" class="block text-sm font-medium">Mot de passe</label>
-            <input id="password" name="password" type="password" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Mot de passe -->
+<x-input-label for="password" :value="__('Mot de passe')" />
+<x-text-input id="password" name="password" type="password" class="mt-1 block w-full" required />
+<x-input-error :messages="$errors->get('password')" class="mt-2 text-red-600" />
 
-        <!-- Confirmation -->
-        <div>
-            <label for="password_confirmation" class="block text-sm font-medium">Confirmer le mot de passe</label>
-            <input id="password_confirmation" name="password_confirmation" type="password" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Confirmation mot de passe -->
+<x-input-label for="password_confirmation" :value="__('Confirmer le mot de passe')" />
+<x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" required />
+<!-- Pas besoin d’erreur ici car elle est incluse dans 'password' -->
 
-        <!-- Rue -->
-        <div>
-            <label for="rue" class="block text-sm font-medium">Rue</label>
-            <input id="rue" name="rue" type="text" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Rue -->
+<x-input-label for="rue" :value="__('Rue')" />
+<x-text-input id="rue" name="rue" type="text" class="mt-1 block w-full" :value="old('rue')" required />
+<x-input-error :messages="$errors->get('rue')" class="mt-2 text-red-600" />
 
-        <!-- Code postal -->
-        <div>
-            <label for="code_postale" class="block text-sm font-medium">Code postal</label>
-            <input id="code_postale" name="code_postale" type="text" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Code postal -->
+<x-input-label for="code_postal" :value="__('Code postal')" />
+<x-text-input id="code_postal" name="code_postal" type="text" class="mt-1 block w-full" :value="old('code_postal')" required />
+<x-input-error :messages="$errors->get('code_postal')" class="mt-2 text-red-600" />
 
-        <!-- Ville -->
-        <div>
-            <label for="ville" class="block text-sm font-medium">Ville</label>
-            <input id="ville" name="ville" type="text" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Ville -->
+<x-input-label for="ville" :value="__('Ville')" />
+<x-text-input id="ville" name="ville" type="text" class="mt-1 block w-full" :value="old('ville')" required />
+<x-input-error :messages="$errors->get('ville')" class="mt-2 text-red-600" />
 
-        <!-- Pays -->
-        <div>
-            <label for="pays" class="block text-sm font-medium">Pays</label>
-            <input id="pays" name="pays" type="text" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Pays -->
+<x-input-label for="pays" :value="__('Pays')" />
+<x-text-input id="pays" name="pays" type="text" class="mt-1 block w-full" :value="old('pays')" required />
+<x-input-error :messages="$errors->get('pays')" class="mt-2 text-red-600" />
 
-        <!-- Téléphone -->
-        <div>
-            <label for="telephone" class="block text-sm font-medium">Téléphone</label>
-            <input id="telephone" name="telephone" type="text" required class="w-full border px-3 py-2 rounded">
-        </div>
+<!-- Téléphone -->
+<x-input-label for="phone" :value="__('Téléphone')" />
+<x-text-input id="phone" name="phone" type="text" class="mt-1 block w-full" :value="old('phone')" required />
+<x-input-error :messages="$errors->get('phone')" class="mt-2 text-red-600" />
 
-        <!-- Bouton -->
-        <div>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                S’inscrire
-            </button>
+        <div class="flex items-center justify-end mt-4">
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+                {{ __('Already registered?') }}
+            </a>
+
+            <x-primary-button class="ms-4">
+                {{ __('Register') }}
+            </x-primary-button>
         </div>
     </form>
-</div>
+</x-guest-layout>

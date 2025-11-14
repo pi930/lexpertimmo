@@ -14,34 +14,35 @@ return new class extends Migration
         Schema::create('devis', function (Blueprint $table) {
             $table->id();
 
-            // 🔐 Lien avec l'utilisateur
+            // 🔐 Lien avec l'utilisateur (optionnel)
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+
+            // 🔢 Référence unique du devis
             $table->string('reference')->unique()->nullable();
 
-
-            // 📄 Fichier PDF stocké
-            $table->string('pdf_path');
-
-            // 💰 Montant total TTC
+            // 💰 Montant total TTC du devis
             $table->decimal('total_ttc', 10, 2);
 
-            // ⏳ Expiration (optionnel)
+            // ⏳ Date d'expiration du devis (optionnelle)
             $table->timestamp('expires_at')->nullable();
 
             // 📌 Statut du devis
             $table->enum('status', ['en attente', 'validé', 'ticket'])->default('en attente');
 
-            // 📇 Coordonnées utilisateur (copiées au moment de la création)
+            // 📇 Coordonnées utilisateur (copiées à la création)
             $table->string('nom')->nullable();
             $table->string('email')->nullable();
             $table->string('telephone')->nullable();
 
-            // 💬 Message utilisateur (optionnel)
+            // 💬 Message personnalisé de l'utilisateur (optionnel)
             $table->text('message')->nullable();
 
+            // 🕒 Dates de création et de mise à jour
             $table->timestamps();
-            $table->index(['user_id', 'status']);
 
+            // 🔍 Index pour les requêtes fréquentes
+            $table->index(['user_id', 'status']);
+            $table->string('pdf_path')->nullable();
         });
     }
 

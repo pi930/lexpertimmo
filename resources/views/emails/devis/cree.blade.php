@@ -1,27 +1,12 @@
-<?PHP
 @component('mail::message')
-# Bonjour {{ $user->name }},
+# Bonjour {{ $user->name }}
 
-Merci d’avoir réalisé un devis chez **Lexpertimmobilier** 🏡  
-Nous avons bien pris en compte votre demande.
+Merci pour votre demande de devis. Vous trouverez ci-joint votre document PDF.
 
-📎 Vous trouverez votre devis en pièce jointe.
-
----
-
-## 📅 Prochaine étape : planifiez votre rendez-vous
-
-Pour aller plus loin, vous pouvez dès maintenant réserver un créneau avec notre équipe :
-
-@component('mail::button', ['url' => $rendezvousUrl])
-Prendre rendez-vous
+@component('mail::button', ['url' => $dashboardUrl ?? '#' ])
+Accéder à votre espace client
 @endcomponent
 
----
-
-Nous restons à votre disposition pour toute question.  
-À très bientôt sur **Lexpertimmobilier** !
-
-**Cordialement,**  
+Cordialement,<br>
 L’équipe Lexpertimmobilier
 @endcomponent

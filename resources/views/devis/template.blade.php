@@ -1,5 +1,7 @@
 {{-- resources/views/devis/template.blade.php --}}
 <div class="section">
+    <strong>Client :</strong> {{ $user->name }}<br>
+    <strong>Email :</strong> {{ $user->email }}
     <strong>Total TTC :</strong> {{ number_format($prixTotal, 2, ',', ' ') }} €
 </div>
 

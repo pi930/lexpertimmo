@@ -3,7 +3,7 @@
 @section('content')
 <style>
     body {
-        background: linear-gradient(to right, red, white, blue);
+        background: linear-gradient(to right, #0055A4, #ffffff, #EF4135); /* Bleu, blanc, rouge */
         min-height: 100vh;
         padding-bottom: 100px;
     }
@@ -11,6 +11,9 @@
         margin-top: 2rem;
         font-size: 1.5rem;
         font-weight: bold;
+        color: #0055A4;
+        border-bottom: 2px solid #EF4135;
+        padding-bottom: 0.5rem;
     }
     table {
         background-color: white;
@@ -19,28 +22,49 @@
         margin-bottom: 2rem;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    th, td {
+    th {
+        background-color: #0055A4;
+        color: white;
+    }
+    td {
         border: 1px solid #ccc;
         padding: 0.75rem;
         text-align: center;
     }
-    .prestations-section {
-        background-color: #f8f9fa;
-        padding: 1rem;
+    .card {
+        border: 1px solid #EF4135;
         border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .card-title {
+        color: #0055A4;
+    }
+    .btn-primary {
+        background-color: #0055A4;
+        border-color: #0055A4;
+    }
+    .btn-outline-secondary {
+        border-color: #EF4135;
+        color: #EF4135;
+    }
+    .btn-outline-secondary:hover {
+        background-color: #EF4135;
+        color: white;
+    }
+    .prestations-section {
+        background-color: #ffffffdd;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.15);
         margin-bottom: 3rem;
-    }
-    .prestations-section h3 {
-        margin-bottom: 1rem;
-    }
-    .prestations-section .form-check {
-        margin-bottom: 0.5rem;
+        border-left: 6px solid #0055A4;
     }
     .login-prompt {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background-color: #ffffffcc;
+        background-color: #EF4135cc;
+        color: white;
         padding: 1rem 1.5rem;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0,0,0,0.2);
@@ -49,13 +73,20 @@
 </style>
 
 <div class="container">
-    <h1 class="mb-4">Nos prestations</h1>
+    <h1 class="mb-4 text-center text-white">Nos prestations</h1>
 
     @auth
         <p class="text-success">Bienvenue {{ Auth::user()->name }} !</p>
     @else
         <p class="text-warning">Connectez-vous pour créer un devis personnalisé.</p>
     @endauth
+    
+    @if($user)
+        pour {{ $user->name }}
+    @else
+        (visiteur)
+    @endif
+</h1>
 
     <div class="row">
         @foreach($prestations as $prestation)
@@ -67,7 +98,7 @@
                         <p class="card-text"><strong>Prix :</strong> {{ $prestation->prix }} €</p>
 
                         @auth
-                            <a href="{{ route('devis.genererApresLogin', ['prestation' => $prestation->id]) }}" class="btn btn-primary">Créer mon devis</a>
+                            <a href="{{ route('devis.generer', ['prestation' => $prestation->id]) }}" class="btn btn-primary">Créer mon devis</a>
                         @else
                             <a href="{{ route('login') }}" class="btn btn-outline-secondary">Se connecter pour créer un devis</a>
                         @endauth
@@ -122,101 +153,62 @@
             <tr><td>Zone non habitable < 200m²</td><td>+160€ TTC</td><td>+160€ TTC</td><td>+160€ TTC</td><td>+160€ TTC</td></tr>
         </tbody>
     </table>
-</hr>
-</hr>
-</hr>
 
-   <div class="prestations-section">
-    <h3>Prestations</h3>
-    <form method="POST" action="{{ route('devis.calculer') }}">
-        @csrf
+    <div class="prestations-section">
+        <h3 class="text-center text-primary mb-4">Créer votre devis</h3>
 
-        <div class="mb-3">
-            <label class="form-label">Type de bien :</label><br>
-            <div class="form-check form-check-inline">
-                     <input class="form-check-input" type="radio" name="typeBien" id="vente" value="vente" required>
-                     {{ in_array('vente', old('options', [])) ? 'checked' : '' }}>
+        <form method="POST" action="{{ route('devis.calculer') }}">
+            @csrf
 
-                <label class="form-check-label" for="vente">Maison à vendre</label>
-            </div>
-</hr>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="typeBien" id="location" value="location">
-                 {{ in_array('location', old('options', [])) ? 'checked' : '' }}>
-                <label class="form-check-label" for="location">Maison à louer</label>
-            </div>
-        </div>
-</hr>
-        <div class="mb-3">
-    <label class="form-label">Prestations supplémentaires :</label><br>
-
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="options[]" value="gaz_cuisson" id="gaz_cuisson">
-        {{ in_array('gaz_cuisson', old('options', [])) ? 'checked' : '' }}>
-        <label class="form-check-label" for="gaz_cuisson">Gaz cuisson</label>
-</div>
-</hr>
-
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="options[]" value="gaz_chaudiere" id="gaz_chaudiere">
-        {{ in_array('gaz_chaudiere', old('options', [])) ? 'checked' : '' }}>
-        <label class="form-check-label" for="gaz_chaudiere">Gaz chaudière</label>
-    </div>
-</hr>
-
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="options[]" value="plomb" id="plomb">
-          {{ in_array('plmob', old('options', [])) ? 'checked' : '' }}>
-        <label class="form-check-label" for="plomb">Plomb (maison < 1949)</label>
-    </div>
-</hr>
-
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="options[]" value="zone_non_habitable_50" id="zone_non_habitable_50">
-         {{ in_array('zone_non_habitable_50', old('options', [])) ? 'checked' : '' }}>
-        <label class="form-check-label" for="zone_non_habitable_50">Zone non habitable < 50m²</label>
-    </div>
-</hr>
-
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="options[]" value="zone_non_habitable_100" id="zone_non_habitable_100">
-        {{ in_array('zone_non_habitable_100', old('options', [])) ? 'checked' : '' }}>
-        <label class="form-check-label" for="zone_non_habitable_100">Zone non habitable < 100m²</label>
-    </div>
-</hr>
-
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="options[]" value="zone_non_habitable_150" id="zone_non_habitable_150">
-        {{ in_array('zone_non_habitable_150', old('options', [])) ? 'checked' : '' }}>
-        <label class="form-check-label" for="zone_non_habitable_150">Zone non habitable < 150m²</label>
-    </div>
-</hr>
-
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="options[]" value="zone_non_habitable_200" id="zone_non_habitable_200">
-         {{ in_array('zone_non_habitable_200', old('options', [])) ? 'checked' : '' }}>
-        <label class="form-check-label" for="zone_non_habitable_200">Zone non habitable < 200m²</label>
-    </div>
-</div>
-</hr>
-
-        <div class="mb-3">
-            <label class="form-label">Surface :</label><br>
-            @foreach(['<50m²','<100m²','<150m²','<200m²'] as $surface)
+            <fieldset class="mb-4">
+                <legend class="fs-6 fw-bold text-danger">Type de bien</legend>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="surface" id="surface{{ $loop->index }}" value="{{ $surface }}" required>
-                    <label class="form-check-label" for="surface{{ $loop->index }}">Maison {{ $surface }}</label>
+                    <input class="form-check-input" type="radio" name="typeBien" id="vente" value="vente" required>
+                    <label class="form-check-label" for="vente">Maison à vendre</label>
                 </div>
-            @endforeach
-        </div>
-</hr>
-</hr>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="typeBien" id="location" value="location">
+                    <label class="form-check-label" for="location">Maison à louer</label>
+                </div>
+            </fieldset>
 
-        <button type="submit" class="btn btn-primary">Calculer</button>
-    
-</div>
-    </form>
-</div>
+            {{-- Prestations supplémentaires --}}
+            <fieldset class="mb-4">
+                <legend class="fs-6 fw-bold text-danger">Prestations supplémentaires</legend>
+                @php $options = old('options', []); @endphp
+                @foreach([
+                    'gaz_cuisson' => 'Gaz cuisson',
+                    'gaz_chaudiere' => 'Gaz chaudière',
+                    'plomb' => 'Plomb (maison < 1949)',
+                    'zone_non_habitable_50' => 'Zone non habitable < 50m²',
+                    'zone_non_habitable_100' => 'Zone non habitable < 100m²',
+                    'zone_non_habitable_150' => 'Zone non habitable < 150m²',
+                    'zone_non_habitable_200' => 'Zone non habitable < 200m²'
+                ] as $value => $label)
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="options[]" value="{{ $value }}" id="{{ $value }}"
+                            {{ in_array($value, $options) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="{{ $value }}">{{ $label }}</label>
+                    </div>
+                @endforeach
+            </fieldset>
+
+            {{-- Surface --}}
+            <fieldset class="mb-4">
+                <legend class="fs-6 fw-bold text-danger">Surface du bien</legend>
+                @foreach(['<50m²','<100m²','<150m²','<200m²'] as $surface)
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="surface" id="surface{{ $loop->index }}" value="{{ $surface }}" required>
+                        <label class="form-check-label" for="surface{{ $loop->index }}">Maison {{ $surface }}</label>
+                    </div>
+                @endforeach
+            </fieldset>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Calculer le devis</button>
+            </div>
+        </form>
+    </div>
 
     @guest
         <div class="login-prompt">
@@ -224,4 +216,4 @@
         </div>
     @endguest
 </div>
-@endsection  
+@endsection

@@ -33,14 +33,18 @@ class CoordonneesController extends Controller
 
     public function show()
     {
-        $coordonnees = Coordonnee::where('user_id', Auth::id())->first();
-        return view('dashboard.coordonnees', compact('coordonnees'));
+      $user = Auth::user();
+    $coordonnees = Coordonnee::where('user_id', $user->id)->get();
+    $IsAdmin = $user->role === 'IsAdmin'; // ou selon ton système de rôle
+
+    return view('dashboard.coordonnees', compact('coordonnees', 'IsAdmin'));
+
     }
 
-    public function showAdmin($userId)
+    public function showIsAdmin($userId)
     {
         $coordonnees = Coordonnee::where('user_id', $userId)->first();
-        return view('dashboard.coordonnees_admin', compact('coordonnees'));
+        return view('dashboard.coordonnees_IsAdmin', compact('coordonnees'));
     }
     public function edit()
 {

@@ -9,6 +9,9 @@ class Coordonnee extends Model
 {
     use HasFactory;
 
+    /**
+     * Champs autorisés à l'assignation de masse
+     */
     protected $fillable = [
         'user_id',
         'nom',
@@ -20,9 +23,11 @@ class Coordonnee extends Model
         'phone',
     ];
 
+    /**
+     * Relation inverse : une coordonnée appartient à un utilisateur
+     */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
-
 }

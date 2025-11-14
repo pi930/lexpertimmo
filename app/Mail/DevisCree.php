@@ -18,21 +18,28 @@ class DevisCree extends Mailable
         $this->devis = $devis;
     }
 
-    public function build()
-    {
-        $user = $this->devis->user;
-        $pdfPath = storage_path("app/{$this->devis->pdf_path}");
+ public function build()
+{
+    $user = $this->devis->user;
 
-        return $this->subject('Merci pour votre devis chez Lexpertimmobilier')
-                    ->attach($pdfPath, [
-                        'as' => 'Votre_devis_Lexpertimmobilier.pdf',
-                        'mime' => 'application/pdf',
-                    ])
-                    ->markdown('emails.devis.cree')
-                    ->with([
-                        'user' => $user,
-                        'devis' => $this->devis,
-                        'rendezvousUrl' => route('rendezvous.index', ['user' => $user->id]),
-                    ]);
+    if (!$user) {
+        throw new \Exception("L'utilisateur lié au devis est introuvable.");
     }
+
+    $pdfPath = storage_path("app/{$this->devis->pdf_path}");
+
+    return $this->subject('Merci pour votre devis chez Lexpertimmobilier')
+                ->attach($pdfPath, [
+                    'as' => 'Votre_devis_Lexpertimmobilier.pdf',
+                    'mime' => 'application/pdf',
+                ])
+                ->markdown('emails.devis.cree')
+                ->with([
+                    'user' => $user,
+                    'devis' => $this->devis,
+                    'messagePerso' => "Bonjour {$user->name}, merci pour votre demande. Vous trouverez ci-joint votre devis personnalisé.",
+                    'dateDevis' => $this->devis->created_at->format('d/m/Y à H:i'),
+                    'dashboardUrl' => route($user->role === 'IsAdmin' ? 'IsAdmin.dashboard_IsAdmin' : 'user.dashboard', ['id' => $user->id]),
+                ]);
+}
 }

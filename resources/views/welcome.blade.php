@@ -32,35 +32,40 @@
             </button>
         </form>
     </div>
-          @php
-            $dashboardRoute = Auth::user()->role === 'admin'
-              ? route('dashboard.admin')
-              : route('dashboard.user');
-          @endphp
+         
+@php
+  $dashboardRoute = Auth::user()->role === 'IsAdmin'
+    ? route('IsAdmin.dashboard_IsAdmin')
+    : route('user.dashboard', ['id' => Auth::id()]);
+@endphp
 
-          <a
-            href="{{ $dashboardRoute }}"
-            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal"
-          >
-            Dashboard
-          </a>
+<a href="{{ $dashboardRoute }}">🏠 Dashboard</a>
+
+{{-- Lien vers la page contact --}}
+<a href="{{ route('user.contact', ['id' => Auth::id()]) }}">📞 Contact</a>
+
+{{-- Lien vers la page prestations --}}
+<a href="{{ route('user.prestations', ['id' => Auth::id()]) }}">💼 Prestations</a>
+
+{{-- Bouton de déconnexion --}}
+<form method="POST" action="{{ route('logout') }}">
+  @csrf
+  <button type="submit">🔒 Se déconnecter</button>
+</form>
         @else
-          <a
-            href="{{ route('login') }}"
-            class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
-          >
-            Log in
-          </a>
+        {{-- Lien vers la page de connexion --}}
+<a href="{{ route('login') }}">🔑 Se connecter</a>
 
-         @if (Route::has('register'))
-        <a
-          href="{{ route('register') }}"
-          class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal"
-        >
-          Créer un nouvel utilisateur
-        </a>
+{{-- Lien vers la page d’inscription --}}
+@if (Route::has('register'))
+  <a href="{{ route('register') }}">📝 Créer un compte</a>
+@endif
 
-          @endif
+{{-- Lien vers une version publique des prestations (si elle existe) --}}
+<a href="{{ route('prestations.public') }}">💼 Prestations</a>
+
+{{-- Lien vers une page contact générique (si elle existe) --}}
+<a href="{{ route('contact.public') }}">📞 Contact</a>
         @endauth
       </nav>
     @endif

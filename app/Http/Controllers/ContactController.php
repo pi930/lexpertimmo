@@ -25,9 +25,9 @@ public function userMessages()
     return view('dashboard.messages', compact('messages'));
 
 }
-public function adminMessages()
+public function IsAdminMessages()
 {
-    if (!Auth::check() || Auth::user()->role !== 'admin') {
+    if (!Auth::check() || Auth::user()->role !== 'IsAdmin') {
         abort(403);
     }
 
@@ -35,17 +35,14 @@ public function adminMessages()
 
     return view('dashboard.messages', compact('messages'));
 }
-public function show(Contact $contact)
-{
-    return view('contact.show', compact('contact'));
-}
+
 public function contactform()
 {
     $user = auth()->user();
-    $isAdmin = $user && $user->role === 'admin';
+    $IsAdmin = $user && $user->role === 'IsAdmin';
 
-    if ($isAdmin) {
-        // Côté admin : récupérer tous les utilisateurs avec leurs coordonnées
+    if ($IsAdmin) {
+        // Côté IsAdmin : récupérer tous les utilisateurs avec leurs coordonnées
         $coordonnees = \App\Models\User::paginate(10); // ou un scope si tu veux filtrer
         $currentUser = null;
     } else {
@@ -55,10 +52,40 @@ public function contactform()
     }
 
     return view('contact', [
-        'isAdmin' => $isAdmin,
+        'IsAdmin' => $IsAdmin,
         'coordonnees' => $coordonnees,
         'user' => $currentUser,
     ]);
+}
+public function showUserMessages($id)
+{
+    if (!Auth::check() || Auth::user()->role !== 'IsAdmin') {
+        abort(403);
+    }
+
+    $messages = Contact::where('user_id', $id)->latest()->paginate(10);
+    $user = \App\Models\User::findOrFail($id);
+
+    return view('dashboard.messages', compact('messages', 'user'));
+}
+public function replyForm($id)
+{
+    $message = Contact::findOrFail($id);
+    return view('dashboard.reply', compact('message'));
+}
+
+public function sendReply(Request $request, $id)
+{
+    $request->validate([
+        'reponse' => 'required|string',
+    ]);
+
+    $message = Contact::findOrFail($id);
+    $message->reponse = $request->reponse;
+    $message->save();
+
+    return redirect()->route('IsAdmin.dashboard.user.messages', ['id' => $message->user_id])
+        ->with('success', 'Réponse enregistrée avec succès.');
 }
 
 public function store(Request $request)
@@ -81,11 +108,17 @@ public function store(Request $request)
 
     $contact = Contact::create($validated);
 
-    return redirect()->route('contact.form')->with([
-        'success' => 'Votre message a bien été envoyé.',
-        'contact_id' => $contact->id,
-    ]);
+   return redirect()->route('dashboard')->with([
+    'success' => 'Votre message a bien été envoyé.',
+    'contact_id' => $contact->id,
+]);
+
 }
-    // Accessible uniquement aux admins
+public function show($id)
+{
+    $contact = Contact::where('user_id', $id)->firstOrFail();
+
+    return view('contact.show', compact('contact'));
+}
    
 }

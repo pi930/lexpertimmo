@@ -5,15 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
+
 {
     use HasFactory, Notifiable;
 
-    // 🔐 Accesseur pour vérifier si l'utilisateur est admin
-    public function getIsAdminAttribute()
+    // 🔐 Accesseur pour vérifier si l'utilisateur est IsAdmin
+    public function getIsIsAdminAttribute()
     {
-        return $this->role === 'isAdmin'; // ou 'is_admin' selon ta base
+        return $this->role === 'IsAdmin'; // ou 'is_IsAdmin' selon ta base
     }
 
     protected $fillable = [
@@ -32,7 +34,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-public function coordonnee()
+public function coordonnees()
 {
     return $this->hasOne(Coordonnee::class);
 }
@@ -61,6 +63,16 @@ public function rendezvous()
     }
     public function notifications()
 {
-    return $this->hasMany(Notification::class, 'admin_id');
+    return $this->hasMany(Notification::class, 'IsAdmin');
 }
+public function dashboardRoute()
+{
+    return $this->role === 'IsAdmin' ? 'IsAdmin.dashboard_IsAdmin' : 'user.dashboard';
+}
+public function dashboardLink(): string
+{
+    return route($this->dashboardRoute(), ['id' => $this->id]);
+}
+
+
 }

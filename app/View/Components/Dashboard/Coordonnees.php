@@ -1,15 +1,15 @@
-</php 
+<?php 
 namespace App\View\Components\Dashboard;
 
 use Illuminate\View\Component;
 
 class Coordonnees extends Component
 {
-    public $isAdmin;
+    public $IsAdmin;
 
-    public function __construct($isAdmin = false)
+    public function __construct($IsAdmin = false)
     {
-        $this->isAdmin = $isAdmin;
+        $this->$IsAdmin;
     }
 
     public function render()

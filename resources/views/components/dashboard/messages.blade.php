@@ -13,10 +13,10 @@
         </div>
     @endif
 
-    @if($isAdmin)
+    @if($IsAdmin)
         @if($messages->count())
             <table class="table-auto w-full border">
-                <thead class="bg-gray-100 dark:bg-gray-800">
+                <thead class="bg-gray-100">
                     <tr>
                         <th class="px-4 py-2">Nom</th>
                         <th class="px-4 py-2">Email</th>

@@ -9,7 +9,7 @@ class CreateNotificationsTable extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('IsAdmin_id')->constrained('users')->onDelete('cascade');
             $table->string('type');
             $table->text('content');
             $table->string('url')->nullable();
