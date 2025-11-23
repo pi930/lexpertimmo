@@ -12,6 +12,7 @@ use App\Mail\DevisCree;
 use App\Models\Devis;
 use App\Models\DevisLigne;
 use App\Models\Objet;
+use App\Models\Notification;
 
 class DevisController extends Controller
 {  public function calculerPrix($typeBien, $surface, $options)
@@ -75,6 +76,11 @@ class DevisController extends Controller
     ]);
 
     return view('devis.resultat', compact('typeBien', 'surface', 'options', 'prixTotal'));
+}
+
+    public function formulaire()
+{
+    return view('devis.formulaire');
 }
     
     public function generer(Request $request, $prestationId = null)
@@ -155,8 +161,8 @@ Mail::to($devis->email)->send(new DevisCree($devis));
 }
 
     // ✅ Redirection vers le dashboard
-    $dashboardRoute = $user->role === 'IsAdmin'
-        ? route('Isdmin.dashboard_addmin', ['id' => $user->id])
+    $dashboardRoute = $user->role === 'Admin'
+        ? route('admin.dashboard', ['id' => $user->id])
         : route('user.dashboard', ['id' => $user->id]);
 
     return redirect($dashboardRoute)->with([
@@ -168,8 +174,8 @@ public function index()
 {
     $user = Auth::user();
 
-    if ($user->role === 'IsAdmin') {
-        // IsAdmin voit tous les devis avec leurs lignes et objets
+    if ($user->role === 'Admin') {
+        // Adminvoit tous les devis avec leurs lignes et objets
         $devis = Devis::with('devisLignes.objet')->latest()->paginate(10);
     } else {
         // Utilisateur voit uniquement ses devis
@@ -178,7 +184,7 @@ public function index()
 
  return view('dashboard.devis', [
     'devis' => $devis, // collection paginée
-    'IsAdmin' => $user->role === 'IsAdmin'
+    'admin' => $user->role === 'Admin'
 ]);
 }
 private function calculerPrixOption(string $opt, string $typeBien, string $surface): int
@@ -205,15 +211,18 @@ public function show($id)
 {
     $user = Auth::user();
     $devis = Devis::with('devisLignes.objet', 'user')->findOrFail($id);
+        // Récupérer les dernières notifications
+    $latestNotifications = Notification::latest()->take(5)->get();
 
-    // 🔒 Sécurité : seul l'IsAdmin ou le propriétaire peut voir le devis
-    if ($user->role !== 'IsAdmin' && $devis->user_id !== $user->id) {
+    // 🔒 Sécurité : seul l'Adminou le propriétaire peut voir le devis
+    if ($user->role !== 'Admin' && $devis->user_id !== $user->id) {
         abort(403, 'Accès interdit à ce devis.');
     }
 
-    return view('IsAdmin.devis.show', [
+    return view('Admin.devis.show', [
     'devis' => $devis,
-    'IsAdmin' => $user->role === 'IsAdmin'
+    'admin' => $user->role === 'Admin'
+    ,'latestNotifications' => $latestNotifications,
 ]);
 }
 
@@ -230,11 +239,11 @@ public function destroy($id)
     return redirect()->back()->with('success', '🗑️ Le devis a été supprimé.');
 }
 
-public function IsAdminDashboard()
+public function AdminDashboard()
 {
     $devis = Devis::latest()->paginate(10);
 
-    return view('IsAdmin.dashboard_IsAdmin', compact('devis'));
+    return view('admin.dashboard', compact('devis'));
 }
     
 }

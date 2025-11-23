@@ -4,13 +4,11 @@
 <div id="messages" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
     <div class="p-6 text-gray-900">
         {{-- Retour et titre --}}
-        @if(isset($user))
-            <a href="{{ route('IsAdmin.dashboard_IsAdmin') }}" class="btn btn-outline-dark mb-4">← Retour IsAdmin</a>
-            <h3 class="text-xl font-bold mb-4">📨 Messages de {{ $user->last_name }}</h3>
-        @else
-            <a href="{{ route('IsAdmin.dashboard_user') }}" class="btn btn-outline-primary mb-4">← Retour utilisateur</a>
-            <h3 class="text-xl font-bold mb-4">📬 Vos messages</h3>
-        @endif
+        @if($admin)
+    <a href="{{ route('admin.dashboard') }}">← Retour Admin</a>
+@else
+    <a href="{{ route('user.dashboard', ['id' => $user->id]) }}">← Retour utilisateur</a>
+@endif
 
         {{-- Liste des messages --}}
         @forelse($messages as $message)
@@ -20,8 +18,8 @@
                 <p><strong>Envoyé le :</strong> {{ $message->created_at->format('d/m/Y H:i') }}</p>
 
                 {{-- Bouton Répondre + Réponse affichée --}}
-                @if(Auth::user()->role === 'IsAdmin')
-                    <a href="{{ route('IsAdmin.contact.reply', ['id' => $message->id]) }}"
+                @if(Auth::user()->role === 'admin')
+                    <a href="{{ route('Admin.contact.reply', ['id' => $message->id]) }}"
                        class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                         ✉️ Répondre
                     </a>
@@ -33,7 +31,7 @@
                     @endif
                 @elseif($message->reponse)
                     <div class="mt-2 p-3 bg-green-50 border rounded">
-                        <p><strong>Réponse de l’IsAdministrateur :</strong> {{ $message->reponse }}</p>
+                        <p><strong>Réponse de l’Administrateur :</strong> {{ $message->reponse }}</p>
                     </div>
                 @endif
             </div>

@@ -5,7 +5,7 @@
         <table class="table-auto w-full border">
             <thead class="bg-gray-100">
                 <tr>
-                    @if($IsAdmin)
+                    @if($admin)
                         <th class="px-4 py-2">Nom</th>
                         <th class="px-4 py-2">Email</th>
                     @endif
@@ -18,7 +18,7 @@
           <tbody>
 @foreach($devis as $item)
     <tr class="border-t hover:bg-gray-100">
-        @if($IsAdmin)
+        @if($admin)
             <td class="px-4 py-2">{{ $item->user->nom ?? '—' }}</td>
             <td class="px-4 py-2">{{ $item->user->email ?? '—' }}</td>
         @endif
@@ -39,7 +39,7 @@
 
     @if($item->devisLignes->count())
         <tr>
-            <td colspan="{{ $IsAdmin ? 6 : 4 }}" class="px-4 py-2 bg-gray-50">
+            <td colspan="{{ $admin? 6 : 4 }}" class="px-4 py-2 bg-gray-50">
                 <ul class="list-disc pl-4 text-sm text-gray-700">
                     @foreach($item->devisLignes as $ligne)
                         <li>{{ $ligne->objet->nom ?? 'Option inconnue' }} — {{ number_format($ligne->prix, 2, ',', ' ') }} €</li>

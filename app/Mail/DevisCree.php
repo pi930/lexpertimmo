@@ -39,7 +39,7 @@ class DevisCree extends Mailable
                     'devis' => $this->devis,
                     'messagePerso' => "Bonjour {$user->name}, merci pour votre demande. Vous trouverez ci-joint votre devis personnalisé.",
                     'dateDevis' => $this->devis->created_at->format('d/m/Y à H:i'),
-                    'dashboardUrl' => route($user->role === 'IsAdmin' ? 'IsAdmin.dashboard_IsAdmin' : 'user.dashboard', ['id' => $user->id]),
+                    'dashboardUrl' => route($user->role === 'Admin' ? 'Admin.dashboard_Admin' : 'user.dashboard', ['id' => $user->id]),
                 ]);
 }
 }

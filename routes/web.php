@@ -12,9 +12,9 @@ use App\Models\Contact;
 // 🎯 Controllers
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\IsAdminController;
-use App\Http\Controllers\IsAdminContactController;
-use App\Http\Controllers\IsAdmin\NotificationController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminContactController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\CoordonneesController;
@@ -34,12 +34,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('/register', [RegisteredUserController::class, 'store']);
 });
-Route::middleware(['auth', 'IsAdmin'])->group(function () {
-    Route::get('/IsAdmin/dashboard/user/{id}/messages', [ContactController::class, 'showUserMessages'])->name('IsAdmin.dashboard.user.messages');
-});
-Route::middleware(['auth', 'IsAdmin'])->group(function () {
-    Route::get('/IsAdmin/contact/reply/{id}', [ContactController::class, 'replyForm'])->name('IsAdmin.contact.reply');
-    Route::post('/IsAdmin/contact/reply/{id}', [ContactController::class, 'sendReply'])->name('IsAdmin.contact.send');
+
+Route::get('/messages/{id}/edit', [ContactController::class, 'edit'])->name('contact.edit');
+Route::put('/messages/{id}', [ContactController::class, 'update'])->name('messages.update');
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/contact/reply/{id}', [ContactController::class, 'replyForm'])->name('messages.reply');
+    Route::post('/admin/contact/reply/{id}', [ContactController::class, 'sendReply'])->name('send.reply');
 });
 
  Route::get('/prestations-public', [PrestationsController::class, 'public'])->name('prestations.public');
@@ -47,7 +48,7 @@ Route::middleware(['auth', 'IsAdmin'])->group(function () {
 // 🧪 Tests & utilitaires
 Route::get('/session-test', fn() => session(['test' => 'ok']) && 'Session test enregistrée');
 Route::post('/test-post', fn() => response()->json(['message' => 'Requête reçue']));
-Route::get('/check-IsAdmin', function () {
+Route::get('/check-Admin', function () {
     $user = User::where('email', 'lexpertimmo06@gmail.com')->first();
     return $user
         ? response()->json(['nom' => $user->name, 'email' => $user->email, 'role' => $user->role])
@@ -63,8 +64,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/contact/public', [ContactController::class, 'contactform'])->name('contact.public');
     Route::post('/contact/store', [ContactController::class, 'store'])->name('contact.store');   
     Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-    Route::get('/contact/{id}', [ContactController::class, 'show'])->name('user.contact');
-   
+    Route::get('/user/{id}/contact', [ContactController::class, 'show'])->name('show.user.contact');
+    Route::delete('/messages/{id}', [ContactController::class, 'destroy'])->name('messages.destroy');
 });
 
 // Messages côté utilisateur connecté
@@ -72,15 +73,29 @@ Route::get('/dashboard/messages', [ContactController::class, 'userMessages'])
     ->middleware('auth')
     ->name('user.messages');
 
-// Messages côté IsAdmin
-Route::get('/IsAdmin/dashboard/messages', [ContactController::class, 'IsAdminMessages'])
-    ->middleware(['auth', 'IsAdmin']) // ou vérification manuelle dans le contrôleur
-    ->name('IsAdmin.messages');
-Route::get('/dashboard', [DashboardController::class, 'redirect'])->name('dashboard');
+// Messages côté Admin
+Route::get('/admin/dashboard/messages', [ContactController::class, 'AdminMessages'])
+    ->middleware(['auth', 'admin']) // ou vérification manuelle dans le contrôleur
+    ->name('admin.messages');
+    Route::get('/dashboard', [DashboardController::class, 'dashboardRoute'])
+    ->middleware('auth')
+    ->name('admin.dashboard');
+Route::middleware(['admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard-main');
+});
+// Dashboard Admin
+Route::get('/admin/dashboard', [DashboardController::class, 'AdminDashboard'])
+    ->middleware('auth')
+    ->name('admin.dashboard');
+
+// Dashboard Utilisateur
+Route::get('/user/{id}/dashboard', [DashboardController::class, 'showUserDashboard'])
+    ->middleware('auth')
+    ->name('user.dashboard');
 
 
     // Coordonnées utilisateur
-    Route::get('/coordonnees', [CoordonneesController::class, 'edit'])->name('coordonnees.form');
+    Route::get('/coordonnees/form', [CoordonneesController::class, 'edit'])->name('coordonnees.form');
     Route::post('/coordonnees', [CoordonneesController::class, 'update'])->name('coordonnees.update');
     Route::post('/coordonnees/store', [CoordonneesController::class, 'store'])->name('coordonnees.store');
     Route::get('/coordonnees/show', [CoordonneesController::class, 'show'])->name('coordonnees.show');
@@ -89,11 +104,19 @@ Route::get('/dashboard', [DashboardController::class, 'redirect'])->name('dashbo
     Route::get('/dashboard/coordonnees', [DashboardController::class, 'coordonnees'])->name('dashboard.coordonnees');
 
     // Messages utilisateur
-    Route::get('/contact/{id}', [ContactController::class, 'show'])->name('user.contact');
-    Route::get('/contact/form', [ContactController::class, 'contactForm'])->name('contact.form');
-    Route::post('/contact', [ContactController::class, 'store'])->name('contact.store.secondary');
-    Route::get('/dashboard/messages', [ContactController::class, 'userMessages'])->name('dashboard.messages');
 
+//    Route::middleware(['auth'])->group(function () {
+//    Route::get('/dashboard', function () {
+//        return view('Admin.dashboard_user');
+//    })->name('dashboard');
+//});
+Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
+  
+   
+  
+Route::get('/user/contact/{id}', [ContactController::class, 'showUserMessages'])->name('user.contact');
 
     // Prestations
     Route::get('/prestations', fn() => view('prestations', ['prestations' => Prestation::all()]))->name('prestations');
@@ -105,25 +128,46 @@ Route::get('/dashboard', [DashboardController::class, 'redirect'])->name('dashbo
     Route::get('/devis/{id}', [DevisController::class, 'show'])->name('devis.show');
     Route::delete('/devis/{id}', [DevisController::class, 'destroy'])->name('devis.destroy');
     Route::post('/devis/send', [DevisController::class, 'sendDevisEmail'])->name('devis.send');
+  Route::get('/devis/formulaire', function () {
+    return view('devis.formulaire');
+})->name('devis.formulaire');
     Route::post('/devis/generer', [DevisController::class, 'generer'])->name('devis.generer');
     Route::post('/devis/calculer', [DevisController::class, 'calculer'])->name('devis.calculer');
 
-// 🛡️ IsAdmin
-Route::middleware(['auth', 'IsAdmin'])->prefix('IsAdmin')->name('IsAdmin.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'IsAdminDashboard'])->name('dashboard_IsAdmin');
-    Route::get('/coordonnees/{userId}', [CoordonneesController::class, 'showIsAdmin'])->name('coordonnees.IsAdmin');
+// 🛡️ Admin
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+   Route::get('/dashboard/admin', [DashboardController::class, 'AdminDashboard'])
+    ->name('Admin.dashboard_Admin');
+});
+Route::get('/coordonnees/{userId}', [CoordonneesController::class, 'showAdmin'])
+    ->name('coordonnees');
 
     // Notifications
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
+Route::middleware(['auth'])
+    ->prefix('user')
+    ->name('user.')
+    ->group(function () {
+        Route::get('/dashboard/{id}', [DashboardController::class, 'dashboardUser'])->name('dashboard_user');
+    });
+
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    });
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
     // Contacts & messages
-    Route::get('/contact', [IsAdminContactController::class, 'index'])->name('contact.index');
-    Route::get('/messages', [IsAdminContactController::class, 'index'])->name('messages.index');
-    Route::get('/messages/{id}', [IsAdminContactController::class, 'show'])->name('messages.show');
-    Route::get('/messages/{id}/reply', [IsAdminContactController::class, 'reply'])->name('messages.reply');
-    Route::delete('/messages/{id}', [IsAdminContactController::class, 'destroy'])->name('messages.destroy');
-});
+    Route::middleware(['admin'])->group(function () {
 
-// 🔒 IsAdmin dashboard (doublon nettoyé)
-Route::middleware(['auth', 'IsAdmin'])->get('/IsAdmin/messages', [ContactController::class, 'IsAdminMessages'])->name('contact.IsAdmin');
+    Route::get('/contact', [AdminContactController::class, 'index'])->name('contact.index');
+    Route::get('/messages', [AdminContactController::class, 'index'])->name('messages.index');
+    Route::get('/messages/{id}', [AdminContactController::class, 'show'])->name('messages.show');
+   // Route::get('/messages/{id}/reply', [AdminContactController::class, 'reply'])->name('messages.reply');
+    });
+   
+    Route::delete('/messages/{id}', [AdminContactController::class, 'destroy'])->name('messages.destroy');
+
+

@@ -35,21 +35,24 @@ class CoordonneesController extends Controller
     {
       $user = Auth::user();
     $coordonnees = Coordonnee::where('user_id', $user->id)->get();
-    $IsAdmin = $user->role === 'IsAdmin'; // ou selon ton système de rôle
+    $admin= $user->role === 'Admin'; // ou selon ton système de rôle
 
-    return view('dashboard.coordonnees', compact('coordonnees', 'IsAdmin'));
+    return view('dashboard.coordonnees', compact('coordonnees', 'admin','user'));
 
     }
 
-    public function showIsAdmin($userId)
+    public function showAdmin($userId)
     {
         $coordonnees = Coordonnee::where('user_id', $userId)->first();
-        return view('dashboard.coordonnees_IsAdmin', compact('coordonnees'));
+        return view('dashboard.coordonnees_Admin', compact('coordonnees'));
     }
     public function edit()
 {
-    $coordonnees = Coordonnee::where('user_id', Auth::id())->first();
-    return view('dashboard.coordonnees_form', compact('coordonnees'));
+    $user = Auth::user();
+    $coordonnees = Coordonnee::where('user_id', $user->id)->first();
+    $admin = $user->role === 'Admin';
+
+    return view('dashboard.coordonnees', compact('coordonnees', 'user', 'admin'));
 }
 
 public function update(Request $request)

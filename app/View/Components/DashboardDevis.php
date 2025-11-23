@@ -6,12 +6,12 @@ use Illuminate\View\Component;
 class DashboardDevis extends Component
 {
     public $devis;
-    public $IsAdmin;
+    public $admin;
 
-    public function __construct($devis, $IsAdmin = false)
+    public function __construct($devis, $admin= false)
     {
         $this->devis = $devis;
-        $this->IsAdmin= $IsAdmin;
+        $this->admin= $admin;
     }
 
     public function render()

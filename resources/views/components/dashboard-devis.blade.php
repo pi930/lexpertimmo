@@ -5,7 +5,7 @@
         <table class="table-auto w-full border">
             <thead class="bg-gray-100">
                 <tr>
-                    @if($IsAdmin)
+                    @if($admin)
                         <th class="px-4 py-2">Nom</th>
                         <th class="px-4 py-2">Email</th>
                     @endif
@@ -18,7 +18,7 @@
             <tbody>
                 @foreach($devis as $d)
                     <tr class="border-t">
-                        @if($IsAdmin)
+                        @if($admin)
                             <td class="px-4 py-2">{{ $d->user->name ?? '—' }}</td>
                             <td class="px-4 py-2">{{ $d->user->email ?? '—' }}</td>
                         @endif

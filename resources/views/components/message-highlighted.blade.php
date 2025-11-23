@@ -7,7 +7,7 @@
     </p>
     @if($message->user_id)
         <p class="text-sm text-gray-600 mt-2">
-            — <a href="{{ route('IsAdmin.dashboard_user', $message->user_id) }}"
+            — <a href="{{ route('Admin.dashboard_user', $message->user_id) }}"
                  class="text-blue-600 hover:underline">Voir profil utilisateur</a>
         </p>
     @endif

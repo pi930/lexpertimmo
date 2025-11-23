@@ -13,7 +13,7 @@
         </div>
     @endif
 
-    @if($IsAdmin)
+    @if($admin)
         @if($messages->count())
             <table class="table-auto w-full border">
                 <thead class="bg-gray-100">
@@ -35,7 +35,7 @@
                             <td class="px-4 py-2">{{ Str::limit($contact->message, 80) }}</td>
                             <td class="px-4 py-2">{{ $contact->created_at->format('d/m/Y H:i') }}</td>
                             <td class="px-4 py-2 space-x-2">
-                                <a href="{{ route('messages.edit', $contact->id) }}" class="text-sm text-yellow-600 hover:underline">Modifier</a>
+                                <a href="{{ route('contact.edit', $contact->id) }}" class="text-sm text-yellow-600 hover:underline">Modifier</a>
                                 <form action="{{ route('messages.destroy', $contact->id) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')

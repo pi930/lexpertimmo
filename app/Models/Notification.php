@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -10,17 +11,17 @@ class Notification extends Model
     use HasFactory;
 
     protected $fillable = [
-        'IsAdmin_id',
+        'admin_id',
         'type',
         'content',
         'url',
         'read',
     ];
 
-    // 🔗 Relation avec l'IsAdmin (User)
-    public function IsAdmin()
+    // 🔗 Relation avec l'Admin(User)
+    public function Admin()
     {
-        return $this->belongsTo(User::class, 'IsAdmin_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     // ✅ Scope pour récupérer les notifications non lues

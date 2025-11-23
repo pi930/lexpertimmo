@@ -1,8 +1,8 @@
 @props([
     'notifications' => [],
     'unreadCount' => 0,
-    'link' => route('IsAdmin.notifications.index'),
-])
+    'link' => route('admin.notifications.index'),
+]);
 
 <div x-data="{ openNotif: false }" class="relative">
     <!-- Bouton cloche -->

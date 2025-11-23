@@ -1,10 +1,10 @@
 <<div class="space-y-6">
     <h2 class="text-2xl font-semibold">📍 Mes coordonnées</h2>
 
-    @if($IsAdmin)
+    @if($admin)
  
         <h3 class="text-xl font-semibold mt-6">📋 Liste des utilisateurs</h3>
-         <a href="{{ route('IsAdmin.dashboard_IsAdmin') }}" class="btn btn-outline-dark">Retour IsAdmin</a>
+         <a href="{{ route('Admin.dashboard_Admin') }}" class="btn btn-outline-dark">Retour Admin</a>
 
         @if($coordonnees->count())
 <table class="table-auto w-full border mt-4">
@@ -23,7 +23,7 @@
                 <tbody>
                     @foreach($coordonnees as $item)
                         <tr class="border-t hover:bg-gray-100 cursor-pointer"
-    onclick="window.location='{{ route('IsAdmin.dashboard.user.messages', ['id' => $item->user_id]) }}'">
+    onclick="window.location='{{ route('Admin.dashboard.user.messages', ['id' => $item->user_id]) }}'">
                             <td class="px-4 py-2">{{ $item->last_name }}</td>
                             <td class="px-4 py-2">{{ $item->rue }}</td>
                             <td class="px-4 py-2">{{ $item->email }}</td>
@@ -56,6 +56,6 @@
                <p><strong> Pays:</strong> {{ $user->Pays}}</p>
             <p><strong>Inscrit le :</strong> {{ $user->created_at->format('d/m/Y H:i') }}</p>
         </div>
-          <a href="{{ route('IsAdmin.dashboard_user') }}" class="btn btn-outline-primary">Retour utilisateur</a>
+        <a href="{{ route('user.dashboard', ['id' => $user->id]) }}" class="btn btn-outline-primary">Retour utilisateur</a>
     @endif
 </div>

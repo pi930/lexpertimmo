@@ -38,7 +38,7 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
-        // ✅ Enregistrement du middleware IsAdmin
-        'IsAdmin' => \App\Http\Middleware\IsAdmin::class,
+        // ✅ Enregistrement du middleware Admin
+        'admin' => \App\Http\Middleware\Admin::class,
     ];
 }

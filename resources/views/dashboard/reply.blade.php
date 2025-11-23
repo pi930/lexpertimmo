@@ -11,7 +11,7 @@
         <p><strong>Reçu le :</strong> {{ $message->created_at->format('d/m/Y H:i') }}</p>
     </div>
 
-    <form action="{{ route('IsAdmin.contact.send', ['id' => $message->id]) }}" method="POST">
+    <form action="{{ route('Admin.contact.send', ['id' => $message->id]) }}" method="POST">
         @csrf
         <div class="mb-4">
             <label for="reponse" class="block text-sm font-medium text-gray-700">Votre réponse :</label>
@@ -24,7 +24,7 @@
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             📤 Envoyer la réponse
         </button>
-        <a href="{{ route('IsAdmin.dashboard.user.messages', ['id' => $message->user_id]) }}" class="ml-4 text-blue-600 hover:underline">
+        <a href="{{ route('Admin.dashboard.user.messages', ['id' => $message->user_id]) }}" class="ml-4 text-blue-600 hover:underline">
             ← Retour aux messages
         </a>
     </form>

@@ -1,9 +1,9 @@
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     {{-- Notifications --}}
-    <div class="bg-white p-4 rounded shadow text-center">
+    {{--<div class="bg-white p-4 rounded shadow text-center">
         <p class="text-sm text-gray-500">Notifications non lues</p>
         <p class="text-xl font-bold text-yellow-600">{{ $unreadCount }}</p>
-    </div>
+    </div>--}}
 
     {{-- Messages --}}
     <div class="bg-white p-4 rounded shadow text-center">

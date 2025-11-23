@@ -21,56 +21,43 @@
     </head>
     <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
   <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
-    @if (Route::has('login'))
-      <nav class="flex items-center justify-end gap-4">
-        @auth
-    <div class="mt-4">
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                🔒 Se déconnecter
-            </button>
-        </form>
-    </div>
-         
-@php
-  $dashboardRoute = Auth::user()->role === 'IsAdmin'
-    ? route('IsAdmin.dashboard_IsAdmin')
-    : route('user.dashboard', ['id' => Auth::id()]);
-@endphp
+ @if (Route::has('login'))
+  <nav class="flex items-center justify-end gap-4">
+    @auth
+      @php
+        $dashboardRoute = Auth::user()->role === 'Admin'
+            ? route('admin.dashboard')
+            : route('user.dashboard', ['id' => Auth::id()]);
+      @endphp
 
-<a href="{{ $dashboardRoute }}">🏠 Dashboard</a>
+      <a href="{{ $dashboardRoute }}">🏠 Dashboard</a>
+      <a href="{{ route('user.contact', ['id' => Auth::id()]) }}">📞 Contact</a>
+      <a href="{{ route('user.prestations', ['id' => Auth::id()]) }}">💼 Prestations</a>
 
-{{-- Lien vers la page contact --}}
-<a href="{{ route('user.contact', ['id' => Auth::id()]) }}">📞 Contact</a>
+      <a href="{{ route('devis.formulaire') }}"
+   class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded hover:bg-green-700 transition">
+   🧮 Calculer un devis
+</a>
 
-{{-- Lien vers la page prestations --}}
-<a href="{{ route('user.prestations', ['id' => Auth::id()]) }}">💼 Prestations</a>
+      <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+          🔒 Se déconnecter
+        </button>
+      </form>
+    @else
+      <a href="{{ route('login') }}">🔑 Se connecter</a>
 
-{{-- Bouton de déconnexion --}}
-<form method="POST" action="{{ route('logout') }}">
-  @csrf
-  <button type="submit">🔒 Se déconnecter</button>
-</form>
-        @else
-        {{-- Lien vers la page de connexion --}}
-<a href="{{ route('login') }}">🔑 Se connecter</a>
+      @if (Route::has('register'))
+        <a href="{{ route('register') }}">📝 Créer un compte</a>
+      @endif
 
-{{-- Lien vers la page d’inscription --}}
-@if (Route::has('register'))
-  <a href="{{ route('register') }}">📝 Créer un compte</a>
+      <a href="{{ route('prestations.public') }}">💼 Prestations</a>
+      <a href="{{ route('contact.public') }}">📞 Contact</a>
+    @endauth
+  </nav>
 @endif
-
-{{-- Lien vers une version publique des prestations (si elle existe) --}}
-<a href="{{ route('prestations.public') }}">💼 Prestations</a>
-
-{{-- Lien vers une page contact générique (si elle existe) --}}
-<a href="{{ route('contact.public') }}">📞 Contact</a>
-        @endauth
-      </nav>
-    @endif
-  
-        </header>
+       </header>
         <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
             <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
                 <div class="text-[13px] leading-[20px] flex-1 p-6 pb-12 lg:p-20 bg-white dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">

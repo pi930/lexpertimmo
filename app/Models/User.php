@@ -12,10 +12,10 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
-    // 🔐 Accesseur pour vérifier si l'utilisateur est IsAdmin
-    public function getIsIsAdminAttribute()
+    // 🔐 Accesseur pour vérifier si l'utilisateur est Admin
+    public function getIsAdminAttribute()
     {
-        return $this->role === 'IsAdmin'; // ou 'is_IsAdmin' selon ta base
+        return $this->role === 'Admin'; // ou 'is_Admin' selon ta base
     }
 
     protected $fillable = [
@@ -34,10 +34,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
-public function coordonnees()
-{
-    return $this->hasOne(Coordonnee::class);
-}
+  // Exemple : relation 1–1
+    public function coordonnees()
+    {
+        return $this->hasOne(Coordonnee::class);
+    }
 
 public function contacts()
 {
@@ -63,16 +64,22 @@ public function rendezvous()
     }
     public function notifications()
 {
-    return $this->hasMany(Notification::class, 'IsAdmin');
+    return $this->hasMany(Notification::class, 'admin_id');
 }
-public function dashboardRoute()
+
+public function messages()
 {
-    return $this->role === 'IsAdmin' ? 'IsAdmin.dashboard_IsAdmin' : 'user.dashboard';
+    return $this->hasMany(Message::class);
+}
+public function dashboardView()
+{
+    return $this->role === 'Admin' ? 'Admin.dashboard_Admin' : 'Admin.dashboard_user';
 }
 public function dashboardLink(): string
 {
-    return route($this->dashboardRoute(), ['id' => $this->id]);
+    return $this->role === 'Admin'
+        ? route('admin.dashboard')
+        : route('user.dashboard', ['id' => $this->id]);
 }
-
 
 }
