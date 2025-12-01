@@ -57,16 +57,25 @@
             <p class="text-gray-500">Aucun message pour le moment.</p>
         <?php endif; ?>
     <?php else: ?>
-        <?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-            <div class="border rounded p-4 mb-3 bg-white shadow-sm">
-                <strong><?php echo e($message->nom); ?></strong> (<?php echo e($message->email); ?>)<br>
-                <em><?php echo e($message->sujet); ?></em><br>
-                <p><?php echo e($message->message); ?></p>
-                <small>Reçu le <?php echo e($message->created_at->format('d/m/Y à H:i')); ?></small>
+<?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+    <div class="border rounded p-4 mb-3 bg-white shadow-sm">
+        <strong><?php echo e($message->nom); ?></strong> (<?php echo e($message->email); ?>)<br>
+        <em>Message de <?php echo e($message->user->name ?? $message->nom); ?></em><br>
+        <p><?php echo e($message->message); ?></p>
+        <small>Reçu le <?php echo e($message->created_at->format('d/m/Y à H:i')); ?></small>
+
+        
+        <?php if(!empty($message->reponse)): ?>
+            <div class="mt-2 p-2 bg-green-100 text-green-800 rounded">
+                <strong>Réponse de l’admin :</strong><br>
+                <?php echo e($message->reponse); ?>
+
             </div>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-            <p class="text-gray-500">Vous n’avez pas encore envoyé de message.</p>
         <?php endif; ?>
+    </div>
+<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+    <p class="text-gray-500">Vous n’avez pas encore envoyé de message.</p>
+<?php endif; ?>
         <div class="mt-4"><?php echo e($messages->links()); ?></div>
     <?php endif; ?>
 </div>

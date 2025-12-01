@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Prestation;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Notification;
 
 class PrestationsController extends Controller
 {
@@ -34,10 +35,12 @@ public function show($id)
     }
 
     $prestations = Prestation::all();
+    $latestNotifications = Notification::latest()->take(5)->get();
 
     return view('prestations', [
         'user' => Auth::user(),
         'prestations' => $prestations,
+        'latestNotifications' => $latestNotifications ,
     ]);
 }
 public function public()

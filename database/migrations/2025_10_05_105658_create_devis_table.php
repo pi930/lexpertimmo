@@ -43,6 +43,11 @@ return new class extends Migration
             // 🔍 Index pour les requêtes fréquentes
             $table->index(['user_id', 'status']);
             $table->string('pdf_path')->nullable();
+            $table->integer('heures_travail')->default(0);
+            $table -> integer('zone_id')->default(0);
+            $table->string('adresse')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
         });
     }
 

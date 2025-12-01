@@ -106,22 +106,16 @@
                 </div>
             </div>
 
-            
-   <div class="bg-white shadow rounded">
-    <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-800">
-            📄 Devis
-        </h2>
-      <?php if (isset($component)) { $__componentOriginalcb418d915e679345752d3a85ae886be7 = $component; } ?>
+<?php if (isset($component)) { $__componentOriginalcb418d915e679345752d3a85ae886be7 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalcb418d915e679345752d3a85ae886be7 = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.dashboard.devis','data' => ['devis' => $devis,'admin' => $admin]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.dashboard.devis','data' => ['devis' => $devisList,'admin' => true]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('dashboard.devis'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['devis' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($devis),'admin' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($admin)]); ?>
+<?php $component->withAttributes(['devis' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($devisList),'admin' => true]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginalcb418d915e679345752d3a85ae886be7)): ?>
@@ -132,37 +126,45 @@
 <?php $component = $__componentOriginalcb418d915e679345752d3a85ae886be7; ?>
 <?php unset($__componentOriginalcb418d915e679345752d3a85ae886be7); ?>
 <?php endif; ?>
-    </div>
-</div>
-    <div class="px-6 py-4">
-        
-        <?php if(session('success')): ?>
-            <div class="mb-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded">
-                <?php echo e(session('success')); ?>
-
-                <?php if(session('devis_link')): ?>
-                    <br>
-                    <a href="<?php echo e(session('devis_link')); ?>" target="_blank" class="text-blue-600 underline">
-                        📄 Voir le devis
-                    </a>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-
-        <?php echo $__env->make('dashboard.devis', ['devis' => $devis, 'admin' => true], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-    </div>
-</div>
-
 
             
-            <div class="bg-white shadow rounded">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-800">📅 Rendez-vous</h2>
-                </div>
-                <div class="px-6 py-4 text-gray-500 italic">
-                    Module en cours de développement…
-                </div>
-            </div>
+<h3>Liste des rendez-vous bloqués :</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rue</th>
+            <th>Code Postal</th>
+            <th>Ville</th>
+            <th>Zone</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $__currentLoopData = $rendezvousBloques; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rdv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <tr>
+                <td><?php echo e($rdv->user->name ?? 'Non assigné'); ?></td>
+                <td><?php echo e($rdv->user->email ?? 'Non assigné'); ?></td>
+                <td><?php echo e($rdv->user->rue ?? 'N/A'); ?></td>
+                <td><?php echo e($rdv->user->code_postal ?? 'N/A'); ?></td>
+                <td><?php echo e($rdv->user->ville ?? 'N/A'); ?></td>
+                <td><?php echo e($rdv->zone); ?></td>
+                <td><?php echo e($rdv->date->format('d/m/Y H:i')); ?></td>
+                <td>
+                    <a href="<?php echo e(route('rendezvous.edit', $rdv->id)); ?>" class="btn btn-warning">Modifier</a>
+                    <form action="<?php echo e(route('admin.rendezvous.supprimer', $rdv->id)); ?>" method="POST" style="display:inline;">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('DELETE'); ?>
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    </tbody>
+</table>
+
 
         </div>
     </div>

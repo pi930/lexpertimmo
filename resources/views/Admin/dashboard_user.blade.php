@@ -39,7 +39,7 @@
         <div class="p-6 text-gray-900">
             <h3 class="text-lg font-bold mb-2">📍 Vos coordonnées</h3>
             @if($coordonnees)
-            <x-dashboard.coordonnees :user="$user" :admin="auth()->user()->role === 'Admin'" />
+            <x-dashboard.coordonnees :user="$user" :admin="$admin" :coordonnees="$coordonnees" />
             @else
                 <p class="text-gray-500">Aucune coordonnée enregistrée.</p>
                 <a href="{{ route('coordonnees.form') }}" class="text-blue-600 underline">➕ Ajouter vos coordonnées</a>
@@ -69,27 +69,41 @@
                     @endif
                 </div>
             @endif
-           <x-dashboard-devis :devis="$devis" :admin="auth()->user()->role === 'Admin'" />
+           <x-dashboard.devis :devis="$devis" :admin="false" />
         </div>
     </div>
 
     {{-- Rendez-vous --}}
-    <div id="rendezvous" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-        <div class="p-6 text-gray-900">
-            <h3 class="text-lg font-bold mb-2">📅 Vos rendez-vous</h3>
-            @isset($rendezvous)
-                @forelse($rendezvous as $rdv)
-                    <div class="mb-4 border-b pb-2">
-                        <p><strong>Date :</strong> {{ $rdv->date->format('d/m/Y H:i') }}</p>
-                        <p><strong>Objet :</strong> {{ $rdv->objet }}</p>
-                    </div>
-                @empty
-                    <p class="text-gray-500">Aucun rendez-vous prévu.</p>
-                @endforelse
-            @else
-                <p class="text-gray-500">Les rendez-vous ne sont pas encore disponibles.</p>
-            @endisset
-        </div>
-    </div>
+    {{-- Si rendez-vous bloqué --}}
+@if($rendezvous->isEmpty())
+    {{-- Bouton pour afficher les propositions --}}
+    @if(empty($propositions))
+        <form action="{{ route('user.rendezvous.propositions') }}" method="GET">
+            <button type="submit" class="btn btn-success">
+                Prendre rendez-vous
+            </button>
+        </form>
+    @else
+        <h3>Choisissez un rendez-vous :</h3>
+        @foreach($propositions as $rdv)
+            <form action="{{ route('rendezvous.reserver', $rdv['id']) }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-primary">
+                    {{ $rdv['zone'] }} - {{ $rdv['date']->format('d/m/Y H:i') }}
+                </button>
+            </form>
+        @endforeach
+    @endif
+@else
+    {{-- Affichage du rendez-vous bloqué --}}
+    <h3>Votre rendez-vous :</h3>
+    @foreach($rendezvous as $rdv)
+        <form action="{{ route('rendezvous.supprimer', $rdv->id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+    @endforeach
+@endif
 
 @endsection

@@ -21,6 +21,10 @@ use App\Http\Controllers\CoordonneesController;
 use App\Http\Controllers\DevisController;
 use App\Http\Controllers\PrestationsController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RendezvousController;
+
+
+
 
 
 // 🏠 Accueil & Auth
@@ -38,7 +42,7 @@ Route::middleware('guest')->group(function () {
 Route::get('/messages/{id}/edit', [ContactController::class, 'edit'])->name('contact.edit');
 Route::put('/messages/{id}', [ContactController::class, 'update'])->name('messages.update');
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/admin/contact/reply/{id}', [ContactController::class, 'replyForm'])->name('messages.reply');
     Route::post('/admin/contact/reply/{id}', [ContactController::class, 'sendReply'])->name('send.reply');
 });
@@ -57,13 +61,13 @@ Route::get('/check-Admin', function () {
 
 Route::get('/dashboard/user/{id}', [DashboardController::class, 'showUserDashboard'])
     ->middleware('auth')
-    ->name('user.dashboard');
+     ->name('user.dashboard.show');
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');    
 
 // 👤 Utilisateur
 Route::middleware('auth')->group(function () {
     Route::get('/contact/public', [ContactController::class, 'contactform'])->name('contact.public');
     Route::post('/contact/store', [ContactController::class, 'store'])->name('contact.store');   
-    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
     Route::get('/user/{id}/contact', [ContactController::class, 'show'])->name('show.user.contact');
     Route::delete('/messages/{id}', [ContactController::class, 'destroy'])->name('messages.destroy');
 });
@@ -133,6 +137,7 @@ Route::get('/user/contact/{id}', [ContactController::class, 'showUserMessages'])
 })->name('devis.formulaire');
     Route::post('/devis/generer', [DevisController::class, 'generer'])->name('devis.generer');
     Route::post('/devis/calculer', [DevisController::class, 'calculer'])->name('devis.calculer');
+    
 
 // 🛡️ Admin
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -158,6 +163,10 @@ Route::middleware(['auth', 'admin'])
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     });
     Route::patch('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+Route::get('/devis/download/{id}', [DevisController::class, 'download'])
+    ->name('devis.download')
+    ->middleware('auth');
+
 
     // Contacts & messages
     Route::middleware(['admin'])->group(function () {
@@ -170,4 +179,49 @@ Route::middleware(['auth', 'admin'])
    
     Route::delete('/messages/{id}', [AdminContactController::class, 'destroy'])->name('messages.destroy');
 
+
+// =========================
+// Routes Utilisateur
+// ==============
+     
+
+    // Afficher les propositions ou le rendez-vous bloqué
+Route::middleware(['auth'])->group(function () {
+
+    // Route principale du dashboard rendez-vous
+    Route::get('/user/rendezvous', [RendezvousController::class, 'indexUser'])
+        ->name('user.rendezvous');
+
+    // Route pour afficher les propositions après clic sur "Prendre rendez-vous"
+    Route::get('/user/rendezvous/propositions', [RendezvousController::class, 'propositions'])
+        ->name('user.rendezvous.propositions');
+
+    // Réserver un rendez-vous (sélection parmi les 3 propositions)
+    Route::post('/user/rendezvous/{id}/reserver', [RendezvousController::class, 'bloquer'])
+        ->name('rendezvous.reserver');
+
+    // Supprimer un rendez-vous bloqué (libérer le créneau)
+    Route::delete('/user/rendezvous/{id}/supprimer', [RendezvousController::class, 'supprimer'])
+        ->name('rendezvous.supprimer');
+});
+
+// =========================
+// Routes Admin
+// =========================
+Route::middleware(['auth', 'admin'])->group(function () {
+    // Liste de tous les rendez-vous bloqués
+    Route::get('/admin/rendezvous', [RendezvousController::class, 'indexAdmin'])
+        ->name('admin.rendezvous');
+
+    // Modifier un rendez-vous bloqué
+    Route::get('/admin/rendezvous/{id}/edit', [RendezvousController::class, 'edit'])
+        ->name('rendezvous.edit');
+
+    Route::put('/admin/rendezvous/{id}', [RendezvousController::class, 'update'])
+        ->name('rendezvous.update');
+
+    // Supprimer un rendez-vous bloqué (libérer le créneau)
+    Route::delete('/admin/rendezvous/{id}/supprimer', [RendezvousController::class, 'supprimerAdmin'])
+        ->name('admin.rendezvous.supprimer');
+});
 

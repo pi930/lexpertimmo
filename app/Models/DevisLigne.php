@@ -1,5 +1,6 @@
 <?php
 namespace App\Models;
+use App\Models\Objet;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,6 +23,7 @@ class DevisLigne extends Model
 
 public function objet()
 {
-    return $this->belongsTo(\App\Models\Objet::class);
+    return $this->belongsTo(Objet::class, 'objet_id');
+
 }
 }

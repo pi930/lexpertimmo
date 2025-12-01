@@ -31,7 +31,7 @@
       @endphp
 
       <a href="{{ $dashboardRoute }}">🏠 Dashboard</a>
-      <a href="{{ route('user.contact', ['id' => Auth::id()]) }}">📞 Contact</a>
+    <a href="{{ route('contact.public') }}">📞 Contact</a>
       <a href="{{ route('user.prestations', ['id' => Auth::id()]) }}">💼 Prestations</a>
 
       <a href="{{ route('devis.formulaire') }}"

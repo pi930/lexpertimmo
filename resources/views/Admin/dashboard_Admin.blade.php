@@ -53,43 +53,46 @@
                 </div>
             </div>
 
-            {{-- Devis --}}
-   <div class="bg-white shadow rounded">
-    <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-800">
-            📄 Devis
-        </h2>
-      <x-dashboard.devis :devis="$devis" :admin="$admin" />
-    </div>
-</div>
-    <div class="px-6 py-4">
-        {{-- ✅ Message de succès après création du devis --}}
-        @if(session('success'))
-            <div class="mb-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded">
-                {{ session('success') }}
-                @if(session('devis_link'))
-                    <br>
-                    <a href="{{ session('devis_link') }}" target="_blank" class="text-blue-600 underline">
-                        📄 Voir le devis
-                    </a>
-                @endif
-            </div>
-        @endif
-
-        @include('dashboard.devis', ['devis' => $devis, 'admin' => true])
-    </div>
-</div>
-
+<x-dashboard.devis :devis="$devisList" :admin="true" />
 
             {{-- Rendez-vous --}}
-            <div class="bg-white shadow rounded">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-800">📅 Rendez-vous</h2>
-                </div>
-                <div class="px-6 py-4 text-gray-500 italic">
-                    Module en cours de développement…
-                </div>
-            </div>
+<h3>Liste des rendez-vous bloqués :</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rue</th>
+            <th>Code Postal</th>
+            <th>Ville</th>
+            <th>Zone</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($rendezvousBloques as $rdv)
+            <tr>
+                <td>{{ $rdv->user->name ?? 'Non assigné' }}</td>
+                <td>{{ $rdv->user->email ?? 'Non assigné' }}</td>
+                <td>{{ $rdv->user->rue ?? 'N/A' }}</td>
+                <td>{{ $rdv->user->code_postal ?? 'N/A' }}</td>
+                <td>{{ $rdv->user->ville ?? 'N/A' }}</td>
+                <td>{{ $rdv->zone }}</td>
+                <td>{{ $rdv->date->format('d/m/Y H:i') }}</td>
+                <td>
+                    <a href="{{ route('rendezvous.edit', $rdv->id) }}" class="btn btn-warning">Modifier</a>
+                    <form action="{{ route('admin.rendezvous.supprimer', $rdv->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
 
         </div>
     </div>

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Contact;
 use App\Models\User;      // ✅ importer ton modèle User
 use App\Models\Notification;
+use App\Models\Devis;
 
 class ContactController extends Controller
 {
@@ -78,14 +79,19 @@ public function showUserMessages($id)
     $coordonnees = $user->coordonnees;
     $devis = $user->devis()->paginate(10);   // ✅ pagination ici
     $rendezvous = $user->rendezvous;
+    $latestNotifications = Notification::latest()->take(5)->get();
+    $devisList = Devis::where('user_id', $user->id)->with('user')->get();
+    $devisList = Devis::where('user_id', $user->id)->with('user')->get();
+
+
 
    if(auth()->user()->role === 'Admin') {
         // Vue admin
-        return view('Admin.dashboard_Admin', compact('user', 'messages', 'coordonnees', 'devis', 'rendezvous'))
+        return view('Admin.dashboard_Admin', compact('user', 'messages', 'coordonnees', 'devis', 'rendezvous','latestNotifications','devisList'))
                ->with('admin', true);
     } else {
         // Vue utilisateur
-        return view('Admin.dashboard_user', compact('user', 'messages', 'coordonnees', 'devis', 'rendezvous'))
+        return view('Admin.dashboard_user', compact('user', 'messages', 'coordonnees', 'devis', 'rendezvous','latestNotifications','devisList'))
 
                ->with('admin', false);
     }
@@ -98,7 +104,6 @@ public function replyForm($id)
 
     return view('contact.reply', compact('message', 'user', 'admin'));
 }
-
 public function sendReply(Request $request, $id)
 {
     $request->validate([
@@ -109,12 +114,11 @@ public function sendReply(Request $request, $id)
     $message->reponse = $request->reponse;
     $message->save();
 
-    // Redirection vers user.contact avec l'ID de l'utilisateur concerné
     return redirect()->route('user.contact', ['id' => $message->user_id])
         ->with('success', 'Réponse envoyée avec succès.');
 }
 /**
- * Formulaire d’édition d’un message
+ * Formulaire d'édition du message
  */
 public function edit($id)
 {

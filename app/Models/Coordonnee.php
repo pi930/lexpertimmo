@@ -1,33 +1,25 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Coordonnee extends Model
 {
-    use HasFactory;
+    protected $table = 'coordonnees'; // table en base
 
-    /**
-     * Champs autorisés à l'assignation de masse
-     */
     protected $fillable = [
         'user_id',
-        'nom',
+        'last_name',
         'rue',
-        'code_postal',
-        'ville',
-        'pays',
         'email',
-        'phone',
+        'telephone',
+        'code_postale',
+        'ville',
+        'Pays',
     ];
 
-    /**
-     * Relation inverse : une coordonnée appartient à un utilisateur
-     */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 }

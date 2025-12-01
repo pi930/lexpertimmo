@@ -1,18 +1,22 @@
-<div>
-    <div class="bg-white p-6 rounded shadow">
-    <h2 class="text-xl font-bold mb-4">📍 Coordonnées</h2>
+@props([
+    'user' => null,
+    'admin' => false,
+    'coordonnees' => null,
+])
+<div class="space-y-6">
+    <h2 class="text-2xl font-semibold">📍 Mes coordonnées</h2>
 
-    @if(isset($user))
-        <p><strong>Nom :</strong> {{ $user->last_name }}</p>
-        <p><strong>Rue :</strong> {{ $user->rue }}</p>
-        <p><strong>Email :</strong> {{ $user->email }}</p>
-       {{-- <p><strong>Téléphone :</strong> {{ $user->phone }}</p>--}}
-        <p><strong>Code postal :</strong> {{ $user->code_postale }}</p>
-        <p><strong>Ville :</strong> {{ $user->ville }}</p>
-        <p><strong>Pays :</strong> {{ $user->Pays }}</p>
-        <p><strong>Inscrit le :</strong> {{ $user->created_at->format('d/m/Y H:i') }}</p>
-    @else
-        <p class="text-gray-500 italic">Aucune information utilisateur disponible.</p>
-    @endif
-</div>
+    @if($coordonnees)
+    <div class="bg-white p-6 rounded shadow">
+        <p><strong>Nom :</strong> {{ $coordonnees->last_name }}</p>
+        <p><strong>Rue :</strong> {{ $coordonnees->rue }}</p>
+        <p><strong>Email :</strong> {{ $coordonnees->email }}</p>
+        <p><strong>Téléphone :</strong> {{ $coordonnees->telephone }}</p>
+        <p><strong>Code postal :</strong> {{ $coordonnees->code_postale }}</p>
+        <p><strong>Ville :</strong> {{ $coordonnees->ville }}</p>
+        <p><strong>Pays :</strong> {{ $coordonnees->Pays }}</p>
+    </div>
+@else
+    <p class="text-gray-600">Aucune coordonnée enregistrée.</p>
+@endif
 </div>

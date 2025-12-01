@@ -35,7 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
   // Exemple : relation 1–1
-    public function coordonnees()
+    public function coordonnee()
     {
         return $this->hasOne(Coordonnee::class);
     }

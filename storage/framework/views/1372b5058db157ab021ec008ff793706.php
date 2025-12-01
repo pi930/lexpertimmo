@@ -31,7 +31,7 @@
       ?>
 
       <a href="<?php echo e($dashboardRoute); ?>">🏠 Dashboard</a>
-      <a href="<?php echo e(route('user.contact', ['id' => Auth::id()])); ?>">📞 Contact</a>
+    <a href="<?php echo e(route('contact.public')); ?>">📞 Contact</a>
       <a href="<?php echo e(route('user.prestations', ['id' => Auth::id()])); ?>">💼 Prestations</a>
 
       <a href="<?php echo e(route('devis.formulaire')); ?>"

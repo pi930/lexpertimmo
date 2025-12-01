@@ -6,17 +6,18 @@
 
     <div class="mb-4">
         <?php if($admin): ?>
-    <p><strong>Client :</strong> <?php echo e($devis->user->name); ?> (<?php echo e($devis->user->email); ?>)</p>
-<?php endif; ?>
+            <p><strong>Client :</strong> <?php echo e($devis->user->name); ?> (<?php echo e($devis->user->email); ?>)</p>
+        <?php endif; ?>
         <p><strong>Date de création :</strong> <?php echo e($devis->created_at->format('d/m/Y à H:i')); ?></p>
-        <p><strong>Objet :</strong> <?php echo e($devis->objet); ?></p>
+        <p><strong>Objet :</strong> <?php echo e($devis->objet ?? '—'); ?></p>
         <p><strong>Status :</strong> <span class="text-blue-600"><?php echo e(ucfirst($devis->status)); ?></span></p>
         <p><strong>Montant total TTC :</strong> <?php echo e(number_format($devis->total_ttc, 2, ',', ' ')); ?> €</p>
     </div>
 
     <?php if($devis->pdf_path): ?>
         <div class="mb-6">
-            <a href="<?php echo e(Storage::url($devis->pdf_path)); ?>" target="_blank" class="text-blue-600 underline">
+            <!-- ✅ Utilisation de la route sécurisée -->
+            <a href="<?php echo e(route('devis.download', $devis->id)); ?>" class="text-blue-600 underline">
                 📎 Télécharger le devis PDF
             </a>
         </div>
@@ -26,8 +27,10 @@
     <ul class="list-disc ms-6 mb-6">
         <?php $__empty_1 = true; $__currentLoopData = $devis->devisLignes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ligne): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <li>
-                <?php echo e($ligne->objet->nom ?? 'Option inconnue'); ?> —
-                <?php echo e(number_format($ligne->prix, 2, ',', ' ')); ?> €
+                <!-- ✅ Affiche le nom de l’objet OU la désignation -->
+                <?php echo e($ligne->objet->nom ?? $ligne->designation ?? 'Option inconnue'); ?>
+
+                — <?php echo e(number_format($ligne->total_ttc, 2, ',', ' ')); ?> €
             </li>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <li>Aucune prestation enregistrée.</li>

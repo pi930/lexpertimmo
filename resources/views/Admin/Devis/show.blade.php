@@ -6,17 +6,18 @@
 
     <div class="mb-4">
         @if($admin)
-    <p><strong>Client :</strong> {{ $devis->user->name }} ({{ $devis->user->email }})</p>
-@endif
+            <p><strong>Client :</strong> {{ $devis->user->name }} ({{ $devis->user->email }})</p>
+        @endif
         <p><strong>Date de création :</strong> {{ $devis->created_at->format('d/m/Y à H:i') }}</p>
-        <p><strong>Objet :</strong> {{ $devis->objet }}</p>
+        <p><strong>Objet :</strong> {{ $devis->objet ?? '—' }}</p>
         <p><strong>Status :</strong> <span class="text-blue-600">{{ ucfirst($devis->status) }}</span></p>
         <p><strong>Montant total TTC :</strong> {{ number_format($devis->total_ttc, 2, ',', ' ') }} €</p>
     </div>
 
     @if($devis->pdf_path)
         <div class="mb-6">
-            <a href="{{ Storage::url($devis->pdf_path) }}" target="_blank" class="text-blue-600 underline">
+            <!-- ✅ Utilisation de la route sécurisée -->
+            <a href="{{ route('devis.download', $devis->id) }}" class="text-blue-600 underline">
                 📎 Télécharger le devis PDF
             </a>
         </div>
@@ -26,8 +27,9 @@
     <ul class="list-disc ms-6 mb-6">
         @forelse($devis->devisLignes as $ligne)
             <li>
-                {{ $ligne->objet->nom ?? 'Option inconnue' }} —
-                {{ number_format($ligne->prix, 2, ',', ' ') }} €
+                <!-- ✅ Affiche le nom de l’objet OU la désignation -->
+                {{ $ligne->objet->nom ?? $ligne->designation ?? 'Option inconnue' }}
+                — {{ number_format($ligne->total_ttc, 2, ',', ' ') }} €
             </li>
         @empty
             <li>Aucune prestation enregistrée.</li>

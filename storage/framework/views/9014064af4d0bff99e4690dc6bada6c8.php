@@ -60,14 +60,14 @@
             <?php if($coordonnees): ?>
             <?php if (isset($component)) { $__componentOriginal05a669ed05f24666dd8637b726a0bf72 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal05a669ed05f24666dd8637b726a0bf72 = $attributes; } ?>
-<?php $component = App\View\Components\Dashboard\Coordonnees::resolve(['user' => $user,'admin' => auth()->user()->role === 'Admin'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component = App\View\Components\Dashboard\Coordonnees::resolve(['user' => $user,'admin' => $admin] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('dashboard.coordonnees'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php $attributes = $attributes->except(\App\View\Components\Dashboard\Coordonnees::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes([]); ?>
+<?php $component->withAttributes(['coordonnees' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($coordonnees)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal05a669ed05f24666dd8637b726a0bf72)): ?>
@@ -127,47 +127,62 @@
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
-           <?php if (isset($component)) { $__componentOriginal1f5eef111affca8eb88c4f9cedef9ed2 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal1f5eef111affca8eb88c4f9cedef9ed2 = $attributes; } ?>
-<?php $component = App\View\Components\DashboardDevis::resolve(['devis' => $devis,'admin' => auth()->user()->role === 'Admin'] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('dashboard-devis'); ?>
+           <?php if (isset($component)) { $__componentOriginalcb418d915e679345752d3a85ae886be7 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalcb418d915e679345752d3a85ae886be7 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.dashboard.devis','data' => ['devis' => $devis,'admin' => false]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('dashboard.devis'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\App\View\Components\DashboardDevis::ignoredParameterNames()); ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
 <?php endif; ?>
-<?php $component->withAttributes([]); ?>
+<?php $component->withAttributes(['devis' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($devis),'admin' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(false)]); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginal1f5eef111affca8eb88c4f9cedef9ed2)): ?>
-<?php $attributes = $__attributesOriginal1f5eef111affca8eb88c4f9cedef9ed2; ?>
-<?php unset($__attributesOriginal1f5eef111affca8eb88c4f9cedef9ed2); ?>
+<?php if (isset($__attributesOriginalcb418d915e679345752d3a85ae886be7)): ?>
+<?php $attributes = $__attributesOriginalcb418d915e679345752d3a85ae886be7; ?>
+<?php unset($__attributesOriginalcb418d915e679345752d3a85ae886be7); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginal1f5eef111affca8eb88c4f9cedef9ed2)): ?>
-<?php $component = $__componentOriginal1f5eef111affca8eb88c4f9cedef9ed2; ?>
-<?php unset($__componentOriginal1f5eef111affca8eb88c4f9cedef9ed2); ?>
+<?php if (isset($__componentOriginalcb418d915e679345752d3a85ae886be7)): ?>
+<?php $component = $__componentOriginalcb418d915e679345752d3a85ae886be7; ?>
+<?php unset($__componentOriginalcb418d915e679345752d3a85ae886be7); ?>
 <?php endif; ?>
         </div>
     </div>
 
     
-    <div id="rendezvous" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-        <div class="p-6 text-gray-900">
-            <h3 class="text-lg font-bold mb-2">📅 Vos rendez-vous</h3>
-            <?php if(isset($rendezvous)): ?>
-                <?php $__empty_1 = true; $__currentLoopData = $rendezvous; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rdv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <div class="mb-4 border-b pb-2">
-                        <p><strong>Date :</strong> <?php echo e($rdv->date->format('d/m/Y H:i')); ?></p>
-                        <p><strong>Objet :</strong> <?php echo e($rdv->objet); ?></p>
-                    </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                    <p class="text-gray-500">Aucun rendez-vous prévu.</p>
-                <?php endif; ?>
-            <?php else: ?>
-                <p class="text-gray-500">Les rendez-vous ne sont pas encore disponibles.</p>
-            <?php endif; ?>
-        </div>
-    </div>
+    
+<?php if($rendezvous->isEmpty()): ?>
+    
+    <?php if(empty($propositions)): ?>
+        <form action="<?php echo e(route('user.rendezvous.propositions')); ?>" method="GET">
+            <button type="submit" class="btn btn-success">
+                Prendre rendez-vous
+            </button>
+        </form>
+    <?php else: ?>
+        <h3>Choisissez un rendez-vous :</h3>
+        <?php $__currentLoopData = $propositions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rdv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <form action="<?php echo e(route('rendezvous.reserver', $rdv['id'])); ?>" method="POST">
+                <?php echo csrf_field(); ?>
+                <button type="submit" class="btn btn-primary">
+                    <?php echo e($rdv['zone']); ?> - <?php echo e($rdv['date']->format('d/m/Y H:i')); ?>
+
+                </button>
+            </form>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    <?php endif; ?>
+<?php else: ?>
+    
+    <h3>Votre rendez-vous :</h3>
+    <?php $__currentLoopData = $rendezvous; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rdv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <form action="<?php echo e(route('rendezvous.supprimer', $rdv->id)); ?>" method="POST">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('DELETE'); ?>
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+<?php endif; ?>
 
 <?php $__env->stopSection(); ?>
 

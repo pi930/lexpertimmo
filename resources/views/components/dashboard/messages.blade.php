@@ -55,16 +55,24 @@
             <p class="text-gray-500">Aucun message pour le moment.</p>
         @endif
     @else
-        @forelse($messages as $message)
-            <div class="border rounded p-4 mb-3 bg-white shadow-sm">
-                <strong>{{ $message->nom }}</strong> ({{ $message->email }})<br>
-                <em>{{ $message->sujet }}</em><br>
-                <p>{{ $message->message }}</p>
-                <small>Reçu le {{ $message->created_at->format('d/m/Y à H:i') }}</small>
+@forelse($messages as $message)
+    <div class="border rounded p-4 mb-3 bg-white shadow-sm">
+        <strong>{{ $message->nom }}</strong> ({{ $message->email }})<br>
+        <em>Message de {{ $message->user->name ?? $message->nom }}</em><br>
+        <p>{{ $message->message }}</p>
+        <small>Reçu le {{ $message->created_at->format('d/m/Y à H:i') }}</small>
+
+        {{-- Affichage de la réponse admin si elle existe --}}
+        @if(!empty($message->reponse))
+            <div class="mt-2 p-2 bg-green-100 text-green-800 rounded">
+                <strong>Réponse de l’admin :</strong><br>
+                {{ $message->reponse }}
             </div>
-        @empty
-            <p class="text-gray-500">Vous n’avez pas encore envoyé de message.</p>
-        @endforelse
+        @endif
+    </div>
+@empty
+    <p class="text-gray-500">Vous n’avez pas encore envoyé de message.</p>
+@endforelse
         <div class="mt-4">{{ $messages->links() }}</div>
     @endif
 </div>

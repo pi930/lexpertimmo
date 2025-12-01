@@ -13,9 +13,12 @@ use App\Models\Devis;
 use App\Models\DevisLigne;
 use App\Models\Objet;
 use App\Models\Notification;
+use Illuminate\Support\Facades\Http; // ⚡ à ajouter en haut
 
 class DevisController extends Controller
-{  public function calculerPrix($typeBien, $surface, $options)
+{  // Dans ton controller
+
+    public function calculerPrix($typeBien, $surface, $options)
 {
     $basePrix = match([$typeBien, $surface]) {
         ['vente', '<50m²'] => 290,
@@ -44,7 +47,7 @@ class DevisController extends Controller
     return $basePrix;
 } 
 
-    public function calculer(Request $request)
+public function calculer(Request $request)
 {
     $request->validate([
         'typeBien' => 'required|in:vente,location',
@@ -57,62 +60,74 @@ class DevisController extends Controller
     $options = $request->input('options', []);
     $prixTotal = $this->calculerPrix($typeBien, $surface, $options);
 
-    // Enregistrement en base
-    if (Auth::check()) {
-        Devis::create([
-            'user_id' => Auth::id(),
-            'typeBien' => $typeBien,
-            'surface' => $surface,
-            'options' => json_encode($options),
-            'total_ttc' => $prixTotal
-        ]);
-    }
+    // Notifications pour le menu
+    $latestNotifications = Notification::latest()->take(5)->get();
 
+    // ⚠️ On ne crée PAS de devis ici
+    // On garde seulement les données en session
     session([
-        'typeBien' => $typeBien,
-        'surface' => $surface,
-        'options' => $options,
-        'prixTotal' => $prixTotal
+        'typeBien'   => $typeBien,
+        'surface'    => $surface,
+        'options'    => $options,
+        'prixTotal'  => $prixTotal
     ]);
 
-    return view('devis.resultat', compact('typeBien', 'surface', 'options', 'prixTotal'));
+    // On affiche uniquement le résultat
+    return view('devis.resultat', compact('typeBien', 'surface', 'options', 'prixTotal', 'latestNotifications'));
 }
-
     public function formulaire()
 {
     return view('devis.formulaire');
 }
-    
-    public function generer(Request $request, $prestationId = null)
+private function calculerHeuresTravail(string $surface, array $options): int
 {
-       $user = Auth::user();
+    $points = 0;
 
- //   if (is_null($user->email_verified_at)) {
- //       return redirect()->route('verification.notice')->with('error', 'Veuillez vérifier votre adresse email.');
-//    }
+    // Zone habitable
+    switch($surface) {
+        case '<50m²':
+        case '<100m²':
+            $points += 1;
+            break;
+        case '<150m²':
+        case '<200m²':
+            $points += 3;
+            break;
+    }
 
-    // 🔐 Authentification
+    // Gaz
+    if(in_array('gaz_chaudiere', $options)) $points += 1;
+    if(in_array('gaz_cuisson', $options)) $points += 1;
+
+    // Plomb
+    if(in_array('plomb', $options)) {
+        $points += 1;
+    }
+
+    // Zone non habitable
+    if(in_array('zone_non_habitable_50', $options)) $points += 1;
+    if(in_array('zone_non_habitable_100', $options)) $points += 2;
+    if(in_array('zone_non_habitable_150', $options)) $points += 3;
+    if(in_array('zone_non_habitable_200', $options)) $points += 3; // ⚡ correction ici
+
+    // Calcul des heures
+    if($points <= 3) {
+        return 2;
+    } elseif($points < 6) {
+        return 3;
+    } else {
+        return 4;
+    }
+}
+    
+
+public function generer(Request $request, $prestationId = null)
+{
     if (!Auth::check()) {
         return redirect()->route('login')->with('redirect_after_login', 'devis');
     }
 
     $user = Auth::user();
-
-    // 📦 Préchargement depuis une prestation si fournie
-    if ($prestationId) {
-        $prestation = Prestation::find($prestationId);
-
-        if (!$prestation) {
-            return redirect()->route('prestations')->with('error', 'Prestation introuvable.');
-        }
-
-        session()->put([
-            'typeBien'   => session('typeBien', 'vente'),
-            'surface'    => session('surface', '<100m²'),
-            'options'    => session('options', [$prestation->titre]),
-            'prixTotal'  => session('prixTotal', $prestation->prix),
-        ]);
-    }
 
     // 🧾 Récupération des données du devis
     $typeBien   = session('typeBien');
@@ -124,68 +139,152 @@ class DevisController extends Controller
         return redirect()->route('devis.calculer')->with('error', 'Session expirée, veuillez recalculer votre devis.');
     }
 
-    // 🧮 Calcul des prestations
-    $prestations = collect($options)->map(fn($opt) => [
-        'nom'  => $opt,
-        'prix' => $this->calculerPrixOption($opt, $typeBien, $surface),
+    // 📄 Génération du PDF
+    $pdf = Pdf::loadView('devis.template', compact('typeBien', 'surface', 'options', 'prixTotal', 'user'));
+    $filename = 'devis_' . time() . '.pdf';
+
+    // 🗂️ Enregistrement du devis
+    $devis = Devis::create([
+        'user_id'   => $user->id,
+        'pdf_path'  => $filename,
+        'total_ttc' => $prixTotal,
+        'status'    => 'en attente',
+        'nom'       => $user->name,
+        'email'     => $user->email,
+        'objet'     => "Devis {$typeBien} - {$surface}",
     ]);
 
-// 📄 Génération du PDF
-$pdf = Pdf::loadView('devis.template', compact('typeBien', 'surface', 'prestations', 'prixTotal', 'user'));
-$filename = 'devis_' . time() . '.pdf';
-Storage::put("devis/$filename", $pdf->output());
+    // ✅ Ajout des heures de travail calculées
+    $devis->heures_travail = $this->calculerHeuresTravail($surface, $options);
 
-// 🗂️ Enregistrement du devis
-$devis = Devis::create([
-    'user_id'   => $user->id,
-    'pdf_path'  => "devis/$filename",
-    'total_ttc' => $prixTotal,
-    'status'    => 'en attente',
-    'nom'       => $user->name,
-    'email'     => $user->email,
-    'objet'     => "Devis {$typeBien} - {$surface}",
-]);
+    // 🌍 Géocodage de l’adresse utilisateur
+    if (!empty($user->adresse)) {
+        $response = Http::get("https://maps.googleapis.com/maps/api/geocode/json", [
+            'address' => $user->adresse,
+            'key' => config('services.google_maps.key'),
+        ]);
 
-// 📧 Envoi du mail
-Mail::to($devis->email)->send(new DevisCree($devis));
+        if (!empty($response['results'][0]['geometry']['location'])) {
+            $lat = $response['results'][0]['geometry']['location']['lat'];
+            $lng = $response['results'][0]['geometry']['location']['lng'];
+
+            // 🔍 Recherche de la zone la plus proche
+            $zones = DB::table('zones')->get();
+            $zoneProche = null;
+            $minDistance = PHP_INT_MAX;
+
+            foreach ($zones as $zone) {
+                $distance = $this->distanceKm($lat, $lng, $zone->latitude, $zone->longitude);
+                if ($distance < $minDistance) {
+                    $minDistance = $distance;
+                    $zoneProche = $zone;
+                }
+            }
+
+            // 📌 Associer la zone au devis
+            if ($zoneProche) {
+                $devis->zone_id = $zoneProche->id;
+            }
+        }
+    }
+
+    $devis->save();
+
+    // ➕ Ligne principale
+    DevisLigne::create([
+        'devis_id'         => $devis->id,
+        'designation'      => "Diagnostics obligatoires {$typeBien} - {$surface}",
+        'quantite'         => 1,
+        'prix_unitaire_ht' => $prixTotal,
+        'tva'              => 20,
+        'total_ttc'        => $prixTotal,
+    ]);
+
+    // ➕ Lignes et prestations pour les options
+    $labels = [
+        'gaz_cuisson' => 'Gaz cuisson',
+        'gaz_chaudiere' => 'Gaz chaudière',
+        'plomb' => 'Plomb (maison < 1949)',
+        'zone_non_habitable_50' => 'Zone non habitable < 50m²',
+        'zone_non_habitable_100' => 'Zone non habitable < 100m²',
+        'zone_non_habitable_150' => 'Zone non habitable < 150m²',
+        'zone_non_habitable_200' => 'Zone non habitable < 200m²',
+    ];
+
+    foreach ($options as $opt) {
+        $prixOption = $this->calculerPrixOption($opt, $typeBien, $surface);
+
+        DevisLigne::create([
+            'devis_id'         => $devis->id,
+            'designation'      => $labels[$opt] ?? ucfirst(str_replace('_', ' ', $opt)),
+            'quantite'         => 1,
+            'prix_unitaire_ht' => $prixOption,
+            'tva'              => 20,
+            'total_ttc'        => $prixOption,
+        ]);
+
+        $prestation = Prestation::where('titre', $opt)->first();
+        if ($prestation) {
+            $devis->prestations()->attach($prestation->id, [
+                'quantite' => 1,
+                'prix_unitaire_ht' => $prixOption,
+                'tva' => 20,
+                'total_ttc' => $prixOption,
+            ]);
+        }
+    }
 
     // 📧 Envoi du mail
-   $user = Auth::user();
-   \Log::info("Tentative d'envoi de mail à : " . $user->email);
- try {
-  Mail::raw('Test de mail Laravel', function ($message) use ($user) {
-    $message->to($user->email)->subject('Test simple');
-});
-} catch (\Exception $e) {
-    \Log::error("Erreur d'envoi de mail : " . $e->getMessage());
-}
+    Mail::to($devis->email)->send(new DevisCree($devis));
 
-    // ✅ Redirection vers le dashboard
-    $dashboardRoute = $user->role === 'Admin'
-        ? route('admin.dashboard', ['id' => $user->id])
-        : route('user.dashboard', ['id' => $user->id]);
-
-    return redirect($dashboardRoute)->with([
+    return redirect()->route('dashboard')->with([
         'success'    => '✅ Votre devis a été créé et envoyé !',
-        'devis_link' => Storage::url("devis/$filename"),
+        'devis_link' => route('devis.download', $devis->id),
     ]);
+}
+function distanceKm($lat1, $lon1, $lat2, $lon2) {
+    $earthRadius = 6371; // km
+    $dLat = deg2rad($lat2 - $lat1);
+    $dLon = deg2rad($lon2 - $lon1);
+    $a = sin($dLat/2) * sin($dLat/2) +
+         cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+         sin($dLon/2) * sin($dLon/2);
+    $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+    return $earthRadius * $c;
+}
+public function download($id)
+{
+   logger(Auth::user()->role);
+
+    $devis = Devis::findOrFail($id);
+
+    // Vérification des droits (propriétaire ou admin)
+    $user = Auth::user();
+    if ($user->id !== $devis->user_id && $user->role !== 'Admin') {
+        abort(403, 'Accès refusé');
     }
+
+    return Storage::disk('devis_private')->download($devis->pdf_path);
+}// Dans ton controller
 public function index()
 {
     $user = Auth::user();
 
     if ($user->role === 'Admin') {
-        // Adminvoit tous les devis avec leurs lignes et objets
-        $devis = Devis::with('devisLignes.objet')->latest()->paginate(10);
+        // Admin voit tous les devis avec leurs lignes et objets
+        $devisList = Devis::with('devisLignes.objet', 'user')->latest()->paginate(10);
     } else {
         // Utilisateur voit uniquement ses devis
-        $devis = Devis::with('devisLignes.objet', 'user')->latest()->paginate(10);
+        $devisList = Devis::with('devisLignes.objet')
+                          ->where('user_id', $user->id)
+                          ->latest()
+                          ->paginate(10);
     }
 
- return view('dashboard.devis', [
-    'devis' => $devis, // collection paginée
-    'admin' => $user->role === 'Admin'
-]);
+    return view('dashboard.devis', [
+        'devis' => $devisList, // collection paginée
+        'admin' => $user->role === 'Admin'
+    ]);
 }
 private function calculerPrixOption(string $opt, string $typeBien, string $surface): int
 {
@@ -211,19 +310,25 @@ public function show($id)
 {
     $user = Auth::user();
     $devis = Devis::with('devisLignes.objet', 'user')->findOrFail($id);
-        // Récupérer les dernières notifications
+
+    // Récupérer les dernières notifications
     $latestNotifications = Notification::latest()->take(5)->get();
 
-    // 🔒 Sécurité : seul l'Adminou le propriétaire peut voir le devis
+    // 🔒 Sécurité : vérifier qu'un utilisateur est connecté
+    if (!$user) {
+        abort(403, 'Vous devez être connecté pour accéder à ce devis.');
+    }
+
+    // 🔒 Seul l'Admin ou le propriétaire peut voir le devis
     if ($user->role !== 'Admin' && $devis->user_id !== $user->id) {
         abort(403, 'Accès interdit à ce devis.');
     }
 
     return view('Admin.devis.show', [
-    'devis' => $devis,
-    'admin' => $user->role === 'Admin'
-    ,'latestNotifications' => $latestNotifications,
-]);
+        'devis' => $devis,
+        'admin' => $user->role === 'Admin',
+        'latestNotifications' => $latestNotifications,
+    ]);
 }
 
 public function destroy($id)
@@ -245,5 +350,6 @@ public function AdminDashboard()
 
     return view('admin.dashboard', compact('devis'));
 }
+
     
 }

@@ -23,4 +23,10 @@ class Devis extends Model
 {
     return $this->hasMany(\App\Models\DevisLigne::class);
 }
+// App\Models\Devis.php
+public function prestations()
+{
+    return $this->belongsToMany(Prestation::class, 'devis_prestation')
+                ->withPivot(['quantite', 'prix_unitaire_ht', 'tva', 'total_ttc']);
+}
 }
