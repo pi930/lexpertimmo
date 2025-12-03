@@ -11,13 +11,13 @@
                 <tbody>
                     @foreach($coordonnees as $item)
                         <tr>
-                            <td>{{ $item->last_name }}</td>
+                            <td>{{ $item->nom}}</td>
                             <td>{{ $item->rue }}</td>
                             <td>{{ $item->email }}</td>
                             <td>{{ $item->telephone }}</td>
-                            <td>{{ $item->code_postale }}</td>
+                            <td>{{ $item->code_postal }}</td>
                             <td>{{ $item->ville }}</td>
-                            <td>{{ $item->Pays }}</td>
+                            <td>{{ $item->pays }}</td>
                             <td>{{ $item->created_at->format('d/m/Y H:i') }}</td>
                         </tr>
                     @endforeach
@@ -30,13 +30,13 @@
         @endif
     @else
         <div class="bg-white p-6 rounded shadow">
-            <p><strong>Nom :</strong> {{ $coordonnees->last_name ?? $user->last_name }}</p>
+            <p><strong>Nom :</strong> {{ $coordonnees->nom ?? $user->nom }}</p>
             <p><strong>Rue :</strong> {{ $coordonnees->rue ?? '—' }}</p>
             <p><strong>Email :</strong> {{ $coordonnees->email ?? $user->email }}</p>
             <p><strong>Téléphone :</strong> {{ $coordonnees->telephone ?? '—' }}</p>
-            <p><strong>Code postale :</strong> {{ $coordonnees->code_postale ?? '—' }}</p>
+            <p><strong>Code postale :</strong> {{ $coordonnees->code_postal ?? '—' }}</p>
             <p><strong>Ville :</strong> {{ $coordonnees->ville ?? '—' }}</p>
-            <p><strong>Pays :</strong> {{ $coordonnees->Pays ?? '—' }}</p>
+            <p><strong>Pays :</strong> {{ $coordonnees->pays ?? '—' }}</p>
             <p><strong>Inscrit le :</strong> {{ $user->created_at->format('d/m/Y H:i') }}</p>
         </div>
         <a href="{{ route('user.dashboard', ['id' => $user->id]) }}" class="btn btn-outline-primary">Retour utilisateur</a>

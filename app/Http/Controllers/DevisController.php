@@ -127,23 +127,19 @@ public function generer(Request $request, $prestationId = null)
         return redirect()->route('login')->with('redirect_after_login', 'devis');
     }
 
-    $user = Auth::user();
-
-    // 🧾 Récupération des données du devis
-    $typeBien   = session('typeBien');
-    $surface    = session('surface');
-    $options    = session('options', []);
-    $prixTotal  = session('prixTotal');
+    $user      = Auth::user();
+    $typeBien  = session('typeBien');
+    $surface   = session('surface');
+    $options   = session('options', []);
+    $prixTotal = session('prixTotal');
 
     if (!$typeBien || !$surface || !$prixTotal) {
         return redirect()->route('devis.calculer')->with('error', 'Session expirée, veuillez recalculer votre devis.');
     }
 
-    // 📄 Génération du PDF
-    $pdf = Pdf::loadView('devis.template', compact('typeBien', 'surface', 'options', 'prixTotal', 'user'));
+    // 1) Création du devis (le PDF sera sauvé après que les prestations soient attachées)
     $filename = 'devis_' . time() . '.pdf';
 
-    // 🗂️ Enregistrement du devis
     $devis = Devis::create([
         'user_id'   => $user->id,
         'pdf_path'  => $filename,
@@ -154,34 +150,31 @@ public function generer(Request $request, $prestationId = null)
         'objet'     => "Devis {$typeBien} - {$surface}",
     ]);
 
-    // ✅ Ajout des heures de travail calculées
+    // 2) Heures de travail et zone
     $devis->heures_travail = $this->calculerHeuresTravail($surface, $options);
 
-    // 🌍 Géocodage de l’adresse utilisateur
     if (!empty($user->adresse)) {
         $response = Http::get("https://maps.googleapis.com/maps/api/geocode/json", [
             'address' => $user->adresse,
-            'key' => config('services.google_maps.key'),
+            'key'     => config('services.google_maps.key'),
         ]);
 
         if (!empty($response['results'][0]['geometry']['location'])) {
             $lat = $response['results'][0]['geometry']['location']['lat'];
             $lng = $response['results'][0]['geometry']['location']['lng'];
 
-            // 🔍 Recherche de la zone la plus proche
-            $zones = DB::table('zones')->get();
-            $zoneProche = null;
+            $zones       = DB::table('zones')->get();
+            $zoneProche  = null;
             $minDistance = PHP_INT_MAX;
 
             foreach ($zones as $zone) {
                 $distance = $this->distanceKm($lat, $lng, $zone->latitude, $zone->longitude);
                 if ($distance < $minDistance) {
                     $minDistance = $distance;
-                    $zoneProche = $zone;
+                    $zoneProche  = $zone;
                 }
             }
 
-            // 📌 Associer la zone au devis
             if ($zoneProche) {
                 $devis->zone_id = $zoneProche->id;
             }
@@ -190,7 +183,7 @@ public function generer(Request $request, $prestationId = null)
 
     $devis->save();
 
-    // ➕ Ligne principale
+    // 3) Ajouter les lignes principales
     DevisLigne::create([
         'devis_id'         => $devis->id,
         'designation'      => "Diagnostics obligatoires {$typeBien} - {$surface}",
@@ -200,15 +193,15 @@ public function generer(Request $request, $prestationId = null)
         'total_ttc'        => $prixTotal,
     ]);
 
-    // ➕ Lignes et prestations pour les options
+    // 4) Attacher les prestations via les options
     $labels = [
-        'gaz_cuisson' => 'Gaz cuisson',
-        'gaz_chaudiere' => 'Gaz chaudière',
-        'plomb' => 'Plomb (maison < 1949)',
-        'zone_non_habitable_50' => 'Zone non habitable < 50m²',
-        'zone_non_habitable_100' => 'Zone non habitable < 100m²',
-        'zone_non_habitable_150' => 'Zone non habitable < 150m²',
-        'zone_non_habitable_200' => 'Zone non habitable < 200m²',
+        'gaz_cuisson'              => 'Gaz cuisson',
+        'gaz_chaudiere'            => 'Gaz chaudière',
+        'plomb'                    => 'Plomb (maison < 1949)',
+        'zone_non_habitable_50'   => 'Zone non habitable < 50m²',
+        'zone_non_habitable_100'  => 'Zone non habitable < 100m²',
+        'zone_non_habitable_150'  => 'Zone non habitable < 150m²',
+        'zone_non_habitable_200'  => 'Zone non habitable < 200m²',
     ];
 
     foreach ($options as $opt) {
@@ -226,31 +219,37 @@ public function generer(Request $request, $prestationId = null)
         $prestation = Prestation::where('titre', $opt)->first();
         if ($prestation) {
             $devis->prestations()->attach($prestation->id, [
-                'quantite' => 1,
+                'quantite'         => 1,
                 'prix_unitaire_ht' => $prixOption,
-                'tva' => 20,
-                'total_ttc' => $prixOption,
+                'tva'              => 20,
+                'total_ttc'        => $prixOption,
             ]);
         }
     }
 
-    // 📧 Envoi du mail
+    // 5) Récupérer les prestations attachées (variable AU PLURIEL)
+    $prestations = $devis->prestations()->get()->map(function ($p) {
+        return [
+            'nom'  => $p->titre,
+            'prix' => $p->pivot->total_ttc ?? $p->prix,
+        ];
+    });
+
+    // 6) Générer et sauvegarder le PDF
+    // Assure-toi que storage/app/private/devis existe et que le disk 'devis_private' pointe dessus si tu l'utilises
+    $pdf = Pdf::loadView('devis.template', compact(
+        'typeBien', 'surface', 'options', 'prixTotal', 'user', 'prestations'
+    ));
+
+    $pdf->save(storage_path('app/private/devis/' . $filename));
+
+    // 7) Envoyer l’email
     Mail::to($devis->email)->send(new DevisCree($devis));
 
     return redirect()->route('dashboard')->with([
         'success'    => '✅ Votre devis a été créé et envoyé !',
         'devis_link' => route('devis.download', $devis->id),
     ]);
-}
-function distanceKm($lat1, $lon1, $lat2, $lon2) {
-    $earthRadius = 6371; // km
-    $dLat = deg2rad($lat2 - $lat1);
-    $dLon = deg2rad($lon2 - $lon1);
-    $a = sin($dLat/2) * sin($dLat/2) +
-         cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-         sin($dLon/2) * sin($dLon/2);
-    $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-    return $earthRadius * $c;
 }
 public function download($id)
 {

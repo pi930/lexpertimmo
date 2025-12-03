@@ -13,9 +13,9 @@ class Coordonnee extends Model
         'rue',
         'email',
         'telephone',
-        'code_postale',
+        'code_postal',
         'ville',
-        'Pays',
+        'pays',
     ];
 
     public function user()

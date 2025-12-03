@@ -34,7 +34,7 @@ class CoordonneesController extends Controller
     public function show()
     {
       $user = Auth::user();
-    $coordonnees = Coordonnee::where('user_id', $user->id)->get();
+    $coordonnees = Coordonnee::where('user_id', $user->id)->first();
     $admin= $user->role === 'Admin'; // ou selon ton système de rôle
 
     return view('dashboard.coordonnees', compact('coordonnees', 'admin','user'));

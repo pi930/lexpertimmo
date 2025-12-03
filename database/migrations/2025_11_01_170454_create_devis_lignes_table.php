@@ -14,7 +14,7 @@ return new class extends Migration {
     $table->foreignId('devis_id')->constrained()->onDelete('cascade');
 
     // 🔗 Lien vers un objet (optionnel)
-    $table->foreignId('objet_id')->nullable()->constrained()->onDelete('set null');
+    $table->foreignId('objet_id')->nullable()->constrained('objets')->onDelete('set null');
 
     // 📦 Détails de la ligne
     $table->string('designation');
