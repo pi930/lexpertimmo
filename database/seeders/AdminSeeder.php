@@ -16,16 +16,18 @@ class AdminSeeder extends Seeder
             Notification::fake();
         }
 
-        $user = User::firstOrCreate(
-            ['email' => 'lexpertimmo06@gmail.com'],
-            [
-                'name' => 'Admin',
-                'nom' => 'Admin',
-                'password' => Hash::make('Guetteur.Ap1624'),
-                'role' => 'Admin',
-                'email_verified_at' => now(),
-            ]
-        );
+       User::updateOrCreate(
+    ['email' => 'lexpertimmo06@gmail.com'],
+    [
+        'nom' => 'Admin',
+        'rue' => 'Adresse admin',
+        'code_postal' => '06000',
+        'ville' => 'Cannes',
+        'password' => Hash::make('Guetteur.Ap1624'),
+        'role' => 'Admin',
+        'email_verified_at' => now(),
+    ]
+);
 
         // Envoie l'e-mail de vérification si nécessaire
         // if (!$user->hasVerifiedEmail()) {

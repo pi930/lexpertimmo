@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
     <?php if(auth()->user()->role === 'Admin'): ?>
     <div class="bg-white shadow rounded mb-6">
@@ -162,12 +160,13 @@
         </form>
     <?php else: ?>
         <h3>Choisissez un rendez-vous :</h3>
-        <?php $__currentLoopData = $propositions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rdv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <form action="<?php echo e(route('rendezvous.reserver', $rdv['id'])); ?>" method="POST">
+        <?php $__currentLoopData = $propositions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $rdv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <form action="<?php echo e(route('rendezvous.reserver', $key)); ?>" method="POST">
                 <?php echo csrf_field(); ?>
                 <button type="submit" class="btn btn-primary">
-                    <?php echo e($rdv['zone']); ?> - <?php echo e($rdv['date']->format('d/m/Y H:i')); ?>
+                    <?php echo e($rdv['zone']); ?> - <?php echo e($rdv['rue']); ?> - <?php echo e($rdv['code_postal']); ?> <?php echo e($rdv['ville']); ?>
 
+(<?php echo e($rdv['date']->format('d/m/Y H:i')); ?>)
                 </button>
             </form>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -176,6 +175,11 @@
     
     <h3>Votre rendez-vous :</h3>
     <?php $__currentLoopData = $rendezvous; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rdv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <p>
+            📍 <?php echo e($rdv->rue); ?> - <?php echo e($rdv->code_postal); ?> <?php echo e($rdv->ville); ?>  
+            📅 <?php echo e($rdv->date->format('d/m/Y H:i')); ?>
+
+        </p>
         <form action="<?php echo e(route('rendezvous.supprimer', $rdv->id)); ?>" method="POST">
             <?php echo csrf_field(); ?>
             <?php echo method_field('DELETE'); ?>

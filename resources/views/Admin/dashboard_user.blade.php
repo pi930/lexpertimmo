@@ -85,11 +85,12 @@
         </form>
     @else
         <h3>Choisissez un rendez-vous :</h3>
-        @foreach($propositions as $rdv)
-            <form action="{{ route('rendezvous.reserver', $rdv['id']) }}" method="POST">
+        @foreach($propositions as $key => $rdv)
+            <form action="{{ route('rendezvous.reserver', $key) }}" method="POST">
                 @csrf
                 <button type="submit" class="btn btn-primary">
-                    {{ $rdv['zone'] }} - {{ $rdv['date']->format('d/m/Y H:i') }}
+                    {{ $rdv['zone'] }} - {{ $rdv['rue'] }} - {{ $rdv['code_postal'] }} {{ $rdv['ville'] }}
+({{ $rdv['date']->format('d/m/Y H:i') }})
                 </button>
             </form>
         @endforeach
@@ -98,6 +99,10 @@
     {{-- Affichage du rendez-vous bloqué --}}
     <h3>Votre rendez-vous :</h3>
     @foreach($rendezvous as $rdv)
+        <p>
+            📍 {{ $rdv->rue }} - {{ $rdv->code_postal }} {{ $rdv->ville }}  
+            📅 {{ $rdv->date->format('d/m/Y H:i') }}
+        </p>
         <form action="{{ route('rendezvous.supprimer', $rdv->id) }}" method="POST">
             @csrf
             @method('DELETE')

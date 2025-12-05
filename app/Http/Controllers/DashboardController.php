@@ -26,24 +26,19 @@ public function index()
     $devis = Devis::where('user_id', $user->id)->latest()->paginate(10);
     $admin = $user->role === 'Admin';
     $rendezvous = Rendezvous::where('user_id', $user->id)->latest()->get();
-        // ⚡ Charger les notifications (exemple : les 5 dernières)
+    // ⚡ Charger les notifications (exemple : les 5 dernières)
     $latestNotifications = Notification::latest()->take(5)->get();
 
+    // Utiliser la ville de l’utilisateur comme zone
+    $zone = $coordonnees->ville ?? 'Nice';  
+    $travailHeure = 2; // durée par défaut
+    $service = new RendezvousService();
 
-
-    
-
-        // Utiliser la ville de l’utilisateur
-        $zone = $coordonnees->ville ?? 'Nice'; 
-        $travailHeure = 2; // durée par défaut
-        $service = new RendezvousService();
-
-
-        $propositions = $service->genererPropositions($zone, $travailHeure);
-    
+    // 👇 Correction : on passe bien les 3 paramètres
+    $propositions = $service->genererPropositions($coordonnees, $travailHeure, $zone);
 
     return view('Admin.dashboard_user', compact(
-        'messages','coordonnees','devis','user','admin','rendezvous','latestNotifications'
+        'messages','coordonnees','devis','user','admin','rendezvous','latestNotifications','propositions'
     ));
 }
     /**

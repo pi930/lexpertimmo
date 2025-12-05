@@ -10,9 +10,9 @@ return new class extends Migration {
         Schema::create('coordonnees', function (Blueprint $table) {
             $table->id(); // équivalent à bigint unsigned auto-increment
             $table->string('nom')->nullable(); 
-            $table->string('rue');
-            $table->string('code_postal');
-            $table->string('ville');
+            $table->string('rue')->nullable();
+            $table->string('code_postal')->nullable();
+            $table->string('ville')->nullable();
             $table->string('pays');
             $table->string('telephone')->nullable();
             $table->string('email');

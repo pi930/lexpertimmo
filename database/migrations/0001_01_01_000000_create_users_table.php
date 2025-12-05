@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('rue');
             $table->string('code_postal');
             $table->string('ville');
-            $table->string('pays');
+            $table->string('pays')->nullable()->change();
             $table->string('phone')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
