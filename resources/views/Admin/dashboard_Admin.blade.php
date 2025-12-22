@@ -33,7 +33,7 @@
 <div class="bg-white shadow rounded">
     <div class="px-6 py-4 flex items-center justify-between">
         <div>
-            <p class="text-lg font-semibold text-gray-800">{{ $user->name }}</p>
+            <p class="text-lg font-semibold text-gray-800">{{ $user->nom }}</p>
             <p class="text-sm text-gray-600">{{ $user->email }}</p>
         </div>
        <a href="{{ route('user.dashboard_user', ['id' => $user->id]) }}"
@@ -55,7 +55,7 @@
 
 <x-dashboard.devis :devis="$devisList" :admin="true" />
 
-            {{-- Rendez-vous --}}
+ {{-- Rendez-vous --}}
 <h3>Liste des rendez-vous bloqués :</h3>
 <table class="table">
     <thead>
@@ -73,20 +73,28 @@
     <tbody>
         @foreach($rendezvousBloques as $rdv)
             <tr>
-                <td>{{ $rdv->user->name ?? 'Non assigné' }}</td>
+                <td>{{ $rdv->user->nom ?? 'Non assigné' }}</td>
                 <td>{{ $rdv->user->email ?? 'Non assigné' }}</td>
-                <td>{{ $rdv->user->rue ?? 'N/A' }}</td>
-                <td>{{ $rdv->user->code_postal ?? 'N/A' }}</td>
-                <td>{{ $rdv->user->ville ?? 'N/A' }}</td>
+                <td>{{ $rdv->rue ?? 'N/A' }}</td>
+                <td>{{ $rdv->code_postal ?? 'N/A' }}</td>
+                <td>{{ $rdv->ville ?? 'N/A' }}</td>
                 <td>{{ $rdv->zone }}</td>
                 <td>{{ $rdv->date->format('d/m/Y H:i') }}</td>
                 <td>
-                    <a href="{{ route('rendezvous.edit', $rdv->id) }}" class="btn btn-warning">Modifier</a>
-                    <form action="{{ route('admin.rendezvous.supprimer', $rdv->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Supprimer</button>
-                    </form>
+    {{-- Lien vers le formulaire d’édition --}}
+    <a href="{{ route('admin.rendezvous.edit', $rdv->id) }}">
+        Modifier
+    </a>
+
+
+    {{-- Formulaire de suppression --}}
+    <form action="{{ route('rendezvous.supprimer', $rdv->id) }}" method="POST" style="display:inline;">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-danger">Libérer par Admin</button>
+    </form>
+</td>
+
                 </td>
             </tr>
         @endforeach

@@ -76,13 +76,13 @@
     <h1 class="mb-4 text-center text-white">Nos prestations</h1>
 
     @auth
-        <p class="text-success">Bienvenue {{ Auth::user()->name }} !</p>
+        <p class="text-success">Bienvenue {{ Auth::user()->nom }} !</p>
     @else
         <p class="text-warning">Connectez-vous pour créer un devis personnalisé.</p>
     @endauth
     
     @if($user)
-        pour {{ $user->name }}
+        pour {{ $user->nom }}
     @else
         (visiteur)
     @endif

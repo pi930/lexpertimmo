@@ -58,7 +58,7 @@
 @forelse($messages as $message)
     <div class="border rounded p-4 mb-3 bg-white shadow-sm">
         <strong>{{ $message->nom }}</strong> ({{ $message->email }})<br>
-        <em>Message de {{ $message->user->name ?? $message->nom }}</em><br>
+        <em>Message de {{ $message->user->nom ?? $message->nom }}</em><br>
         <p>{{ $message->message }}</p>
         <small>Reçu le {{ $message->created_at->format('d/m/Y à H:i') }}</small>
 

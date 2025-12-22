@@ -39,7 +39,7 @@ public function build()
                 ->with([
                     'user' => $user,
                     'devis' => $this->devis,
-                    'messagePerso' => "Bonjour {$user->name}, merci pour votre demande. Vous trouverez ci-joint votre devis personnalisé.",
+                    'messagePerso' => "Bonjour {$user->nom}, merci pour votre demande. Vous trouverez ci-joint votre devis personnalisé.",
                     'dateDevis' => $this->devis->created_at->format('d/m/Y à H:i'),
                     'dashboardUrl' => route(
                         $user->role === 'Admin' ? 'Admin.dashboard_Admin' : 'user.dashboard',

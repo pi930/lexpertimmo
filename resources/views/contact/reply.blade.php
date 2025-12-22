@@ -1,4 +1,4 @@
-<h2>Répondre à {{ $user->name }}</h2>
+<h2>Répondre à {{ $user->nom }}</h2>
 <p>Message original : {{ $message->contenu }}</p>
 
 <form action="{{ route('send.reply', $message->id) }}" method="POST">

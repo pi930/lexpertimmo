@@ -1,6 +1,6 @@
 <div class="border p-4 rounded shadow">
     <h2 class="text-lg font-bold mb-2">Devis #{{ $devis->id }}</h2>
-    <p><strong>Client :</strong> {{ $devis->user->name }}</p>
+    <p><strong>Client :</strong> {{ $devis->user->nom }}</p>
     <p><strong>Date :</strong> {{ $devis->created_at->format('d/m/Y') }}</p>
 
     <ul class="mt-2">

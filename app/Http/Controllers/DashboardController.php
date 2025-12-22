@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Contact;
 use App\Models\Message;
 use App\Models\Devis;
-use App\Models\RendezVous;
+use App\Models\Rendezvous;
 use App\Models\Coordonnee;
 use App\Models\Diagnostic;
 use App\Services\RendezvousService;
@@ -26,26 +26,30 @@ public function index()
     $devis = Devis::where('user_id', $user->id)->latest()->paginate(10);
     $admin = $user->role === 'Admin';
     $rendezvous = Rendezvous::where('user_id', $user->id)->latest()->get();
-        // ⚡ Charger les notifications (exemple : les 5 dernières)
+
+    // ⚡ Charger les notifications (exemple : les 5 dernières)
     $latestNotifications = Notification::latest()->take(5)->get();
 
+    // Utiliser l’adresse complète de l’utilisateur
+    $rue         = $coordonnees->rue ?? '';
+    $code_postal = $coordonnees->code_postal ?? '';
+    $ville       = $coordonnees->ville ?? 'Nice';
+    $travailHeure = 2; // durée par défaut
 
+    $service = new RendezvousService();
+ $propositions = $service->genererPropositions(
+    $coordonnees->rue ?? '',
+    $coordonnees->code_postal ?? '',
+    $coordonnees->ville ?? 'Nice',
+    $travailHeure
+);
 
-    
-
-        // Utiliser la ville de l’utilisateur
-        $zone = $coordonnees->ville ?? 'Nice'; 
-        $travailHeure = 2; // durée par défaut
-        $service = new RendezvousService();
-
-
-        $propositions = $service->genererPropositions($zone, $travailHeure);
-    
 
     return view('Admin.dashboard_user', compact(
-        'messages','coordonnees','devis','user','admin','rendezvous','latestNotifications'
+        'messages','coordonnees','devis','user','admin','rendezvous','latestNotifications','propositions'
     ));
 }
+
     /**
      * Redirection principale après login
      */
@@ -74,9 +78,16 @@ public function showUserDashboard($id)
 
         // Utiliser la ville de l’utilisateur (ou coordonnees)
         $zone = $coordonnees->ville ?? 'Nice';
-        $travailHeure = 2; // durée par défaut
+$travailHeure = 2; // durée par défaut
 
-        $propositions = $service->genererPropositions($zone, $travailHeure);
+$propositions = $service->genererPropositions(
+    $coordonnees->rue,
+    $coordonnees->code_postal,
+    $coordonnees->ville,
+    $travailHeure
+);
+
+
     }
 
     return view('Admin.dashboard_user', compact(
@@ -154,7 +165,9 @@ public function dashboardRoute()
 
     $admin = $user->role === 'Admin';
     $notifications = app(NotificationController::class)->latest();
-    $rendezvous = collect(); // collection vide pour éviter l'erreur
+    $rendezvous = Rendezvous::where('user_id', $user->id)
+    ->latest()
+    ->get();
 
    
 

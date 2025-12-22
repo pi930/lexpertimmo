@@ -37,7 +37,7 @@ class Kernel extends HttpKernel
         'auth.custom' => \App\Http\Middleware\EnsureUserIsAuthenticated::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-
+        'role' => \App\Http\Middleware\CheckRole::class,
         // ✅ Enregistrement du middleware Admin
         'admin' => \App\Http\Middleware\Admin::class,
     ];

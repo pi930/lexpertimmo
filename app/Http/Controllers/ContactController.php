@@ -9,6 +9,7 @@ use App\Models\Contact;
 use App\Models\User;      // ✅ importer ton modèle User
 use App\Models\Notification;
 use App\Models\Devis;
+use App\Models\Rendezvous;
 
 class ContactController extends Controller
 {
@@ -81,17 +82,16 @@ public function showUserMessages($id)
     $rendezvous = $user->rendezvous;
     $latestNotifications = Notification::latest()->take(5)->get();
     $devisList = Devis::where('user_id', $user->id)->with('user')->get();
-    $devisList = Devis::where('user_id', $user->id)->with('user')->get();
-
-
+     $rendezvousBloques = Rendezvous::where('bloque', 1)->get();
+    $propositions = Rendezvous::where('user_id', $id)->get();
 
    if(auth()->user()->role === 'Admin') {
         // Vue admin
-        return view('Admin.dashboard_Admin', compact('user', 'messages', 'coordonnees', 'devis', 'rendezvous','latestNotifications','devisList'))
+        return view('Admin.dashboard_Admin', compact('user', 'messages', 'coordonnees', 'devis', 'rendezvous','latestNotifications','devisList',"rendezvousBloques",'propositions'))
                ->with('admin', true);
     } else {
         // Vue utilisateur
-        return view('Admin.dashboard_user', compact('user', 'messages', 'coordonnees', 'devis', 'rendezvous','latestNotifications','devisList'))
+        return view('Admin.dashboard_user', compact('user', 'messages', 'coordonnees', 'devis', 'rendezvous','latestNotifications','devisList',"rendezvousBloques","propositions"))
 
                ->with('admin', false);
     }

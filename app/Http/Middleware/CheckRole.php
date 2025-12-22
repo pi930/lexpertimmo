@@ -1,4 +1,6 @@
 <?php 
+use Illuminate\Support\Facades\Auth;
+
 // middleware/CheckRole.php
 public function handle($request, Closure $next, $role)
 {

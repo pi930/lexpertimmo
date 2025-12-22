@@ -1,5 +1,5 @@
 @component('mail::message')
-# Bonjour {{ $user->name }}
+# Bonjour {{ $user->nom }}
 
 Merci pour votre demande de devis. Vous trouverez ci-joint votre document PDF.
 

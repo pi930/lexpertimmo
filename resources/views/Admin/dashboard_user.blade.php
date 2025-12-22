@@ -73,10 +73,9 @@
         </div>
     </div>
 
-    {{-- Rendez-vous --}}
-    {{-- Si rendez-vous bloqué --}}
+{{-- Rendez-vous --}}
 @if($rendezvous->isEmpty())
-    {{-- Bouton pour afficher les propositions --}}
+    {{-- Si aucun rendez-vous existant --}}
     @if(empty($propositions))
         <form action="{{ route('user.rendezvous.propositions') }}" method="GET">
             <button type="submit" class="btn btn-success">
@@ -86,24 +85,45 @@
     @else
         <h3>Choisissez un rendez-vous :</h3>
         @foreach($propositions as $rdv)
-            <form action="{{ route('rendezvous.reserver', $rdv['id']) }}" method="POST">
+            <form action="{{ route('rendezvous.reserver') }}" method="POST" class="mb-2">
                 @csrf
+                <input type="hidden" name="zone" value="{{ $rdv['zone'] }}">
+                <input type="hidden" name="date" value="{{ $rdv['date'] }}">
+                <input type="hidden" name="travail_heure" value="{{ $rdv['travail_heure'] }}">
+                <input type="hidden" name="rue" value="{{ $rdv['rue'] }}">
+                <input type="hidden" name="code_postal" value="{{ $rdv['code_postal'] }}">
+                <input type="hidden" name="ville" value="{{ $rdv['ville'] }}">
                 <button type="submit" class="btn btn-primary">
-                    {{ $rdv['zone'] }} - {{ $rdv['date']->format('d/m/Y H:i') }}
+                    {{ $rdv['ville'] }} — {{ $rdv['date']->format('d/m/Y H:i') }}
                 </button>
             </form>
         @endforeach
     @endif
 @else
-    {{-- Affichage du rendez-vous bloqué --}}
-    <h3>Votre rendez-vous :</h3>
-    @foreach($rendezvous as $rdv)
-        <form action="{{ route('rendezvous.supprimer', $rdv->id) }}" method="POST">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">Supprimer</button>
-        </form>
-    @endforeach
+    {{-- Si l’utilisateur a déjà des rendez-vous --}}
+    <h3>Mes rendez-vous :</h3>
+    <ul class="list-group">
+        @foreach($rendezvous as $rdv)
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Zone :</strong> {{ $rdv->zone }} <br>
+                    <strong>Date :</strong> {{ $rdv->date->format('d/m/Y H:i') }} <br>
+                    <strong>Durée :</strong> {{ $rdv->travail_heure }} heure(s) <br>
+                    <strong>Adresse :</strong> {{ $rdv->rue }}, {{ $rdv->code_postal }} {{ $rdv->ville }}
+                </div>
+                <div>
+                    <form action="{{ route('rendezvous.supprimer', $rdv->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Supprimer
+                        </button>
+                    </form>
+                </div>
+            </li>
+        @endforeach
+    </ul>
 @endif
+
 
 @endsection

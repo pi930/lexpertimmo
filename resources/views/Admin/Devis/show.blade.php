@@ -6,7 +6,7 @@
 
     <div class="mb-4">
         @if($admin)
-            <p><strong>Client :</strong> {{ $devis->user->name }} ({{ $devis->user->email }})</p>
+            <p><strong>Client :</strong> {{ $devis->user->nom }} ({{ $devis->user->email }})</p>
         @endif
         <p><strong>Date de création :</strong> {{ $devis->created_at->format('d/m/Y à H:i') }}</p>
         <p><strong>Objet :</strong> {{ $devis->objet ?? '—' }}</p>

@@ -23,6 +23,7 @@
                     <th class="px-4 py-2">Statut</th>
                     <th class="px-4 py-2">Date</th>
                     <th class="px-4 py-2">PDF</th>
+                    <th class="px-4 py-2">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,7 +32,7 @@
                         <td class="px-4 py-2">{{ $item->id }}</td>
 
                         @if($admin)
-                            <td class="px-4 py-2">{{ $item->user->name ?? '—' }}</td>
+                            <td class="px-4 py-2">{{ $item->user->nom?? '—' }}</td>
                             <td class="px-4 py-2">{{ $item->heures_travail ?? '—' }} h</td>
                         @endif
 
@@ -72,6 +73,14 @@
                                 —
                             @endif
                         </td>
+                        <td class="px-4 py-2">
+    <form action="{{ route('devis.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Supprimer ce devis ?')">
+        @csrf
+        @method('DELETE')
+        <button class="text-red-600 hover:underline">🗑️ Supprimer</button>
+    </form>
+</td>
+
                     </tr>
 
                     <!-- Détails supplémentaires sous le devis -->

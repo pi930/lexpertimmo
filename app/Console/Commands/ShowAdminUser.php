@@ -28,7 +28,7 @@ class ShowAdminUser extends Command
     $user = \App\Models\User::where('email', 'lexpertimmo06@gmail.com')->first();
 
     if ($user) {
-        $this->info("Nom : {$user->name}");
+        $this->info("Nom : {$user->nom}");
         $this->info("Email : {$user->email}");
         $this->info("Rôle : {$user->role}");
     } else {

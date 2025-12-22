@@ -197,31 +197,33 @@ Route::middleware(['auth'])->group(function () {
         ->name('user.rendezvous.propositions');
 
     // Réserver un rendez-vous (sélection parmi les 3 propositions)
-    Route::post('/user/rendezvous/{id}/reserver', [RendezvousController::class, 'bloquer'])
-        ->name('rendezvous.reserver');
+  Route::post('user/rendezvous/reserver', [RendezvousController::class, 'reserver'])
+     ->name('rendezvous.reserver');
+
+});
+
+
 
     // Supprimer un rendez-vous bloqué (libérer le créneau)
-    Route::delete('/user/rendezvous/{id}/supprimer', [RendezvousController::class, 'supprimer'])
-        ->name('rendezvous.supprimer');
-});
+ // routes/web.php
+Route::delete('/rendezvous/{id}/supprimer', [RendezvousController::class, 'supprimer'])
+    ->name('rendezvous.supprimer')
+    ->middleware(['auth']);
+
 
 // =========================
 // Routes Admin
 // =========================
+
 Route::middleware(['auth', 'admin'])->group(function () {
-    // Liste de tous les rendez-vous bloqués
+
     Route::get('/admin/rendezvous', [RendezvousController::class, 'indexAdmin'])
         ->name('admin.rendezvous');
 
-    // Modifier un rendez-vous bloqué
     Route::get('/admin/rendezvous/{id}/edit', [RendezvousController::class, 'edit'])
-        ->name('rendezvous.edit');
+        ->name('admin.rendezvous.edit');
 
-    Route::put('/admin/rendezvous/{id}', [RendezvousController::class, 'update'])
-        ->name('rendezvous.update');
-
-    // Supprimer un rendez-vous bloqué (libérer le créneau)
-    Route::delete('/admin/rendezvous/{id}/supprimer', [RendezvousController::class, 'supprimerAdmin'])
-        ->name('admin.rendezvous.supprimer');
+    Route::put('/admin/rendezvous/{id}', [RendezvousController::class, 'updateAdmin'])
+        ->name('admin.rendezvous.update');
 });
 

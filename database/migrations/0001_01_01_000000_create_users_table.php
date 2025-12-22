@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('role')->default('User');
             $table->string('nom');
-            $table->string('rue');
-            $table->string('code_postal');
-            $table->string('ville');
-            $table->string('pays');
+            $table->string('rue')->nullable();
+            $table->string('code_postal')->nullable();
+            $table->string('ville')->nullable();
+            $table->string('pays')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

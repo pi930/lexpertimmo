@@ -15,17 +15,21 @@ class AdminSeeder extends Seeder
         if (app()->environment('local')) {
             Notification::fake();
         }
+User::updateOrCreate(
+    ['email' => 'lexpertimmo06@gmail.com'],
+    [
+        'nom' => 'Admin',
+        'rue' => 'Adresse admin',
+        'code_postal' => '00000',
+        'ville' => 'Cannes',
+        'pays' => 'France',
+        'phone' => '0000000000',
+        'password' => Hash::make('Guetteur.Ap1624'),
+        'role' => 'Admin',
+        'email_verified_at' => now(),
+    ]
+);
 
-        $user = User::firstOrCreate(
-            ['email' => 'lexpertimmo06@gmail.com'],
-            [
-                'name' => 'Admin',
-                'nom' => 'Admin',
-                'password' => Hash::make('Guetteur.Ap1624'),
-                'role' => 'Admin',
-                'email_verified_at' => now(),
-            ]
-        );
 
         // Envoie l'e-mail de vérification si nécessaire
         // if (!$user->hasVerifiedEmail()) {

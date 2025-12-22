@@ -8,7 +8,7 @@
                 🏠 Tableau de bord
             </a>
 
-            <a href="#messages"
+            <a href="{{ route('user.contact', ['id' => Auth::id()]) }}"
                class="px-3 py-2 rounded bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 transition">
                 📬 Messages
             </a>
@@ -31,7 +31,7 @@
             @endif
 
             <span class="text-gray-700 font-medium">
-                👤 {{ Auth::user()->name }}
+                👤 {{ Auth::user()->nom }}
             </span>
 
             <!-- Retour accueil -->

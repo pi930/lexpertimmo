@@ -19,7 +19,7 @@
                 @foreach($devis as $d)
                     <tr class="border-t">
                         @if($admin)
-                            <td class="px-4 py-2">{{ $d->user->name ?? '—' }}</td>
+                            <td class="px-4 py-2">{{ $d->user->nom ?? '—' }}</td>
                             <td class="px-4 py-2">{{ $d->user->email ?? '—' }}</td>
                         @endif
                         <td class="px-4 py-2">{{ $d->objet }}</td>

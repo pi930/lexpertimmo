@@ -18,6 +18,15 @@ use Illuminate\Support\Facades\Http; // ⚡ à ajouter en haut
 class DevisController extends Controller
 {  // Dans ton controller
 
+    private array $prestationsObligatoires = [
+    'Amiante',
+    'Surface',
+    'Termites',
+    'DPE',
+    'ELEC',
+    'ERP',
+];
+ 
     public function calculerPrix($typeBien, $surface, $options)
 {
     $basePrix = match([$typeBien, $surface]) {
@@ -73,7 +82,14 @@ public function calculer(Request $request)
     ]);
 
     // On affiche uniquement le résultat
-    return view('devis.resultat', compact('typeBien', 'surface', 'options', 'prixTotal', 'latestNotifications'));
+    return view('devis.resultat', [
+    'typeBien' => $typeBien,
+    'surface' => $surface,
+    'options' => $options,
+    'prixTotal' => $prixTotal,
+    'latestNotifications' => $latestNotifications,
+    'prestationsObligatoires' => $this->prestationsObligatoires,
+]);
 }
     public function formulaire()
 {
@@ -145,7 +161,7 @@ public function generer(Request $request, $prestationId = null)
         'pdf_path'  => $filename,
         'total_ttc' => $prixTotal,
         'status'    => 'en attente',
-        'nom'       => $user->name,
+        'nom'       => $user->nom,
         'email'     => $user->email,
         'objet'     => "Devis {$typeBien} - {$surface}",
     ]);
@@ -207,25 +223,16 @@ public function generer(Request $request, $prestationId = null)
     foreach ($options as $opt) {
         $prixOption = $this->calculerPrixOption($opt, $typeBien, $surface);
 
-        DevisLigne::create([
-            'devis_id'         => $devis->id,
-            'designation'      => $labels[$opt] ?? ucfirst(str_replace('_', ' ', $opt)),
-            'quantite'         => 1,
-            'prix_unitaire_ht' => $prixOption,
-            'tva'              => 20,
-            'total_ttc'        => $prixOption,
-        ]);
+       // 3) Ajouter les lignes principales
+DevisLigne::create([
+    'devis_id'         => $devis->id,
+    'designation'      => "Diagnostics obligatoires {$typeBien} - {$surface}",
+    'quantite'         => 1,
+    'prix_unitaire_ht' => $prixTotal,
+    'tva'              => 20,
+    'total_ttc'        => $prixTotal,
+]);
 
-        $prestation = Prestation::where('titre', $opt)->first();
-        if ($prestation) {
-            $devis->prestations()->attach($prestation->id, [
-                'quantite'         => 1,
-                'prix_unitaire_ht' => $prixOption,
-                'tva'              => 20,
-                'total_ttc'        => $prixOption,
-            ]);
-        }
-    }
 
     // 5) Récupérer les prestations attachées (variable AU PLURIEL)
     $prestations = $devis->prestations()->get()->map(function ($p) {
@@ -241,7 +248,8 @@ public function generer(Request $request, $prestationId = null)
         'typeBien', 'surface', 'options', 'prixTotal', 'user', 'prestations'
     ));
 
-    $pdf->save(storage_path('app/private/devis/' . $filename));
+    Storage::disk('devis_private')->put($filename, $pdf->output());
+
 
     // 7) Envoyer l’email
     Mail::to($devis->email)->send(new DevisCree($devis));
@@ -250,6 +258,7 @@ public function generer(Request $request, $prestationId = null)
         'success'    => '✅ Votre devis a été créé et envoyé !',
         'devis_link' => route('devis.download', $devis->id),
     ]);
+}
 }
 public function download($id)
 {

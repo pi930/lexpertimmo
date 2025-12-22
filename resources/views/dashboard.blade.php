@@ -29,7 +29,7 @@
                     @foreach($devisList as $d)
                         <tr>
                             <td>{{ $d->id }}</td>
-                            <td>{{ $d->user->name }}</td>
+                            <td>{{ $d->user->nom }}</td>
                             <td>{{ number_format($d->total_ttc, 2, ',', ' ') }} €</td>
                             <td>{{ $d->heures_travail ?? '0' }} h</td>
                             <td>{{ $d->created_at->format('d/m/Y H:i') }}</td>
