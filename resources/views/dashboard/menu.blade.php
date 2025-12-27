@@ -26,9 +26,10 @@
 
         <!-- Zone utilisateur -->
         <div class="flex items-center space-x-4 text-sm">
-            @if(Auth::user()->role === 'Admin')
-                <x-dashboard.notifications :notifications="$latestNotifications" />
-            @endif
+           @if(Auth::user()->role === 'Admin' && isset($latestNotifications))
+    <x-dashboard.notifications :notifications="$latestNotifications" />
+@endif
+
 
             <span class="text-gray-700 font-medium">
                 👤 {{ Auth::user()->nom }}

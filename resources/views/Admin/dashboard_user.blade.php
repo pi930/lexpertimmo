@@ -34,18 +34,16 @@
                 </div>
             </div>
 
-    {{-- Coordonnées --}}
-    <div id="coordonnees" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-        <div class="p-6 text-gray-900">
-            <h3 class="text-lg font-bold mb-2">📍 Vos coordonnées</h3>
-            @if($coordonnees)
-            <x-dashboard.coordonnees :user="$user" :admin="$admin" :coordonnees="$coordonnees" />
-            @else
-                <p class="text-gray-500">Aucune coordonnée enregistrée.</p>
-                <a href="{{ route('coordonnees.form') }}" class="text-blue-600 underline">➕ Ajouter vos coordonnées</a>
-            @endif
-        </div>
+<div id="coordonnees" class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+    <div class="p-6 text-gray-900">
+        <h3 class="text-lg font-bold mb-2">📍 Vos coordonnées</h3>
+
+        <x-dashboard.coordonnees :user="$user" :admin="$admin" :coordonnees="$coordonnees" />
+
     </div>
+</div>
+
+
 
 <div class="bg-white shadow rounded">
     <div class="px-6 py-4 border-b border-gray-200">

@@ -71,6 +71,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/{id}/contact', [ContactController::class, 'show'])->name('show.user.contact');
     Route::delete('/messages/{id}', [ContactController::class, 'destroy'])->name('messages.destroy');
 });
+Route::post('/user/find', [UserController::class, 'findUser'])->name('user.find');
+
+Route::get('/user/{id}/dashboard', [UserController::class, 'dashboardUser'])
+    ->name('user.dashboard');
 
 // Messages côté utilisateur connecté
 Route::get('/dashboard/messages', [ContactController::class, 'userMessages'])
@@ -116,7 +120,6 @@ Route::get('/user/{id}/dashboard', [DashboardController::class, 'showUserDashboa
 //});
 Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-
   
    
   
@@ -153,8 +156,13 @@ Route::middleware(['auth'])
     ->prefix('user')
     ->name('user.')
     ->group(function () {
-        Route::get('/dashboard/{id}', [DashboardController::class, 'dashboardUser'])->name('dashboard_user');
+
+        // Dashboard utilisateur
+        Route::get('/dashboard/{id}', [DashboardController::class, 'dashboardUser'])
+            ->name('dashboard_user');
+
     });
+
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')

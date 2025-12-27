@@ -68,7 +68,7 @@ public function showUserDashboard($id)
     $coordonnees = $user->coordonnee ?? null;
     $devis = Devis::where('user_id', $user->id)->latest()->paginate(10);
     $rendezvous = Rendezvous::where('user_id', $user->id)->latest()->get();
-    $admin = $user->role === 'Admin';
+    $admin = false;
 
     // ⚡ Toujours définir $propositions
     $propositions = [];

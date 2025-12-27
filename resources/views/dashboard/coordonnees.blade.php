@@ -28,17 +28,35 @@
                 {{ $coordonnees->links() }}
             </div>
         @endif
-    @else
-        <div class="bg-white p-6 rounded shadow">
-            <p><strong>Nom :</strong> {{ $coordonnees->nom ?? $user->nom }}</p>
-            <p><strong>Rue :</strong> {{ $coordonnees->rue ?? '—' }}</p>
-            <p><strong>Email :</strong> {{ $coordonnees->email ?? $user->email }}</p>
-            <p><strong>Téléphone :</strong> {{ $coordonnees->telephone ?? '—' }}</p>
-            <p><strong>Code postale :</strong> {{ $coordonnees->code_postal ?? '—' }}</p>
-            <p><strong>Ville :</strong> {{ $coordonnees->ville ?? '—' }}</p>
-            <p><strong>Pays :</strong> {{ $coordonnees->pays ?? '—' }}</p>
-            <p><strong>Inscrit le :</strong> {{ $user->created_at->format('d/m/Y H:i') }}</p>
-        </div>
-        <a href="{{ route('user.dashboard', ['id' => $user->id]) }}" class="btn btn-outline-primary">Retour utilisateur</a>
+  @else
+    <div class="bg-white p-6 rounded shadow">
+        <p><strong>Nom :</strong> {{ $coordonnees->nom ?? $user->nom }}</p>
+        <p><strong>Rue :</strong> {{ $coordonnees->rue ?? '—' }}</p>
+        <p><strong>Email :</strong> {{ $coordonnees->email ?? $user->email }}</p>
+        <p><strong>Téléphone :</strong> {{ $coordonnees->telephone ?? '—' }}</p>
+        <p><strong>Code postale :</strong> {{ $coordonnees->code_postal ?? '—' }}</p>
+        <p><strong>Ville :</strong> {{ $coordonnees->ville ?? '—' }}</p>
+        <p><strong>Pays :</strong> {{ $coordonnees->pays ?? '—' }}</p>
+        <p><strong>Inscrit le :</strong> {{ $user->created_at->format('d/m/Y H:i') }}</p>
+    </div>
+
+    {{-- Boutons Ajouter / Modifier --}}
+    @if(Route::has('user.coordonnees.edit'))
+        @if($coordonnees)
+            <a href="{{ route('user.coordonnees.edit', $user->id) }}"
+               class="btn btn-primary mt-3">
+                ✏️ Modifier mes coordonnées
+            </a>
+        @else
+            <a href="{{ route('user.coordonnees.edit', $user->id) }}"
+               class="btn btn-success mt-3">
+                ➕ Ajouter mes coordonnées
+            </a>
+        @endif
     @endif
+
+    <a href="{{ route('user.dashboard', ['id' => $user->id]) }}" class="btn btn-outline-primary mt-3">
+        Retour utilisateur
+    </a>
+@endif
 </div>

@@ -1,8 +1,16 @@
+# Logs
 *.log
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Environment
 .env
 .env.backup
 .env.production
+
+# IDE / Tools
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -12,20 +20,24 @@
 /.vscode
 /.zed
 /auth.json
+
+# Node / Build
 /node_modules
 /public/build
 /public/hot
+
+# Storage
 /public/storage
 /storage/*.key
 /storage/pail
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+
+# Vendor
 /vendor
+
+# Homestead
 Homestead.json
 Homestead.yaml
-Thumbs.db
-/vendor
-/node_modules
-.env
-/public/storage
-/storage/*.key
-.idea
-.vscode
