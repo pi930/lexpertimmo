@@ -23,7 +23,53 @@
   <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
  @if (Route::has('login'))
   <nav class="flex items-center justify-end gap-4">
-    @auth
+  <!-- Bandeau bleu blanc rouge -->
+<div class="w-full flex h-3">
+    <div class="flex-1 bg-blue-600"></div>
+    <div class="flex-1 bg-white"></div>
+    <div class="flex-1 bg-red-600"></div>
+</div>
+
+<!-- Section Présentation -->
+<section class="max-w-4xl mx-auto mt-10 px-6 text-center">
+
+    <h1 class="text-4xl font-bold text-blue-700 mb-4">
+        Bienvenue sur LEXPERTIMMO
+    </h1>
+
+    <h2 class="text-2xl font-semibold text-red-600 mb-6">
+        L’expert immobilier de votre Côte d’Azur
+    </h2>
+
+    <p class="text-lg leading-relaxed text-gray-700 mb-4">
+        Fort de <span class="font-bold text-blue-700">20 ans d’expérience</span> dans le domaine de l’expertise immobilière,
+        <span class="font-bold text-blue-700">LEXPERTIMMO</span> vous accompagne dans toutes vos démarches de diagnostics
+        et d’évaluations immobilières.
+    </p>
+
+    <p class="text-lg leading-relaxed text-gray-700 mb-4">
+        Nous réalisons des diagnostics <span class="font-bold text-blue-700">DPE, amiante, plomb et termites</span>
+        avec une précision reconnue et des tarifs parmi les
+        <span class="font-bold text-red-600">moins chers du marché</span>.
+    </p>
+
+    <p class="text-lg leading-relaxed text-gray-700 mb-4">
+        Que votre bien soit situé à Nice, Cannes, Antibes, Grasse ou partout ailleurs sur la
+        <span class="font-bold text-blue-700">Côte d’Azur</span>, nous mettons notre expertise à votre service
+        pour garantir sécurité, conformité et transparence.
+    </p>
+
+    <p class="text-lg leading-relaxed text-gray-700">
+        Avec LEXPERTIMMO, vous bénéficiez d’un accompagnement fiable, rapide et professionnel
+        pour tous vos diagnostics immobiliers.
+    </p>
+
+</section>
+
+<!-- Ligne tricolore bas -->
+<div class="w-full h-2 mt-10 bg-gradient-to-r from-blue-600 via-white to-red-600"></div>
+  
+  @auth
       @php
         $dashboardRoute = Auth::user()->role === 'Admin'
             ? route('admin.dashboard')

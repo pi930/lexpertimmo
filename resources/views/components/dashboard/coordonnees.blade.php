@@ -35,7 +35,7 @@
         </div>
 
         {{-- Bouton ajouter --}}
-        <a href="{{ route('coordonnees.form') }}" class="btn btn-success mt-3">
+<a href="{{ route('coordonnees.form') }}" class="btn btn-primary mt-3">
     ➕ Ajouter mes coordonnées
 </a>
 

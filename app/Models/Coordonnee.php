@@ -7,16 +7,17 @@ class Coordonnee extends Model
 {
     protected $table = 'coordonnees'; // table en base
 
-    protected $fillable = [
-        'user_id',
-        'last_name',
-        'rue',
-        'email',
-        'telephone',
-        'code_postal',
-        'ville',
-        'pays',
-    ];
+   protected $fillable = [
+    'nom',
+    'rue',
+    'telephone',
+    'ville',
+    'code_postal',
+    'pays',
+    'email',
+    'user_id',
+];
+
 
     public function user()
     {

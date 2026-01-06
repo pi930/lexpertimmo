@@ -103,9 +103,10 @@ Route::get('/user/{id}/dashboard', [DashboardController::class, 'showUserDashboa
 
 
     // Coordonnées utilisateur
-    Route::get('/coordonnees/form', [CoordonneesController::class, 'edit'])->name('coordonnees.form');
-    Route::post('/coordonnees', [CoordonneesController::class, 'update'])->name('coordonnees.update');
-    Route::post('/coordonnees/store', [CoordonneesController::class, 'store'])->name('coordonnees.store');
+   Route::get('/coordonnees/form', [CoordonneesController::class, 'edit'])
+    ->name('coordonnees.form');
+    Route::post('/coordonnees', [CoordonneesController::class, 'store'])->name('coordonnees.store');
+    Route::put('/coordonnees/{id}', [CoordonneesController::class, 'update'])->name('coordonnees.update');
     Route::get('/coordonnees/show', [CoordonneesController::class, 'show'])->name('coordonnees.show');
 
     // Coordonnées partagées

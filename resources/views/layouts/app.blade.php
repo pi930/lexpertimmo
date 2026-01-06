@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Mon Application')</title>
 
-    {{-- Chargement des styles et scripts --}}
+    {{-- Styles & Scripts --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-gray-50 text-gray-900">
 
-    {{-- Inclusion du menu de navigation --}}
+    {{-- Bandeau tricolore --}}
+    <div class="w-full flex h-2">
+        <div class="flex-1 bg-blue-600"></div>
+        <div class="flex-1 bg-white"></div>
+        <div class="flex-1 bg-red-600"></div>
+    </div>
+
+    {{-- Menu de navigation --}}
     @include('dashboard.menu')
 
     {{-- Contenu principal --}}
@@ -18,5 +26,6 @@
         @yield('content')
     </main>
 
-    </body>
+</body>
 </html>
+

@@ -81,7 +81,10 @@ public function showUserMessages($id)
     $devis = $user->devis()->paginate(10);   // ✅ pagination ici
     $rendezvous = $user->rendezvous;
     $latestNotifications = Notification::latest()->take(5)->get();
-    $devisList = Devis::where('user_id', $user->id)->with('user')->get();
+   $devisList = Devis::where('user_id', $user->id)
+                  ->with('user')
+                  ->latest()
+                  ->paginate(10);
      $rendezvousBloques = Rendezvous::where('bloque', 1)->get();
     $propositions = Rendezvous::where('user_id', $id)->get();
 
