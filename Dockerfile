@@ -14,19 +14,24 @@ RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+
 WORKDIR /var/www/html
 
 COPY . .
 
+# 🔥 Créer la base SQLite vide
+RUN mkdir -p database && touch database/database.sqlite
+
 RUN composer install --no-dev --optimize-autoloader
 
-# 🔥 Ajout essentiel pour Laravel
+# 🔥 Dossiers essentiels pour Laravel
 RUN mkdir -p storage/framework/cache \
     storage/framework/sessions \
     storage/framework/views \
     storage/logs
 
-RUN chmod -R 777 storage bootstrap/cache
+# 🔥 Permissions
+RUN chmod -R 777 storage bootstrap/cache database
 
 EXPOSE 10000
 
