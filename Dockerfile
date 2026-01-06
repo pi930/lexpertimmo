@@ -53,7 +53,7 @@ RUN chmod -R 777 storage bootstrap/cache database
 # ---------------------------------------------------------
 # 7) Exécuter les migrations
 # ---------------------------------------------------------
-RUN php artisan migrate --force
+CMD php artisan migrate --force && php artisan serve --host 0.0.0.0 --port 10000
 
 # ---------------------------------------------------------
 # 8) Exposer le port utilisé par Render
