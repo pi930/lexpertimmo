@@ -20,6 +20,12 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
+# 🔥 Ajout essentiel pour Laravel
+RUN mkdir -p storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs
+
 RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 10000
