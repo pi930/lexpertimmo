@@ -42,8 +42,12 @@ RUN mkdir -p storage/framework/cache \
 # 7) Permissions
 RUN chmod -R 777 storage bootstrap/cache database
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 10000
 
 # 8) Migrations au démarrage
-CMD php artisan migrate --force && php artisan serve --host 0.0.0.0 --port 10000
+CMD ["/entrypoint.sh"]
+
 
