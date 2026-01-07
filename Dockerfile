@@ -28,11 +28,13 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev
 
+# Extensions PHP
 RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Dossier de travail
 WORKDIR /var/www/html
 
 # Copier le code Laravel
@@ -63,3 +65,4 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 10000
 
 CMD ["/entrypoint.sh"]
+
