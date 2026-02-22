@@ -1,5 +1,5 @@
 # -----------------------------
-# 1) Build des assets avec Node
+# 1) Build des assets Vite
 # -----------------------------
 FROM node:20 AS build-assets
 
@@ -15,7 +15,7 @@ RUN npm run build
 # -----------------------------
 # 2) Image PHP pour Laravel
 # -----------------------------
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
 # Dépendances système
 RUN apt-get update && apt-get install -y \
@@ -43,26 +43,17 @@ COPY . .
 # Copier les assets buildés
 COPY --from=build-assets /app/public/build ./public/build
 
-# Base SQLite
-RUN mkdir -p database && touch database/database.sqlite
-
-# Dépendances PHP
+# Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Dossiers Laravel
-RUN mkdir -p storage/framework/cache \
-    storage/framework/sessions \
-    storage/framework/views \
-    storage/logs
+# Préparer Laravel
+RUN php artisan storage:link || true
 
 # Permissions
-RUN chmod -R 777 storage bootstrap/cache database
+RUN chmod -R 777 storage bootstrap/cache
 
-# Entrypoint
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
+# Exposer le port Render
 EXPOSE 10000
 
-CMD ["/entrypoint.sh"]
-
+# Commande de démarrage
+CMD php artisan serve --host 0.0.0.0 --port $PORT
