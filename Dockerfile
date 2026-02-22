@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev
 
 # Extensions PHP
-RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mbstring zip exif pcntl bcmath
 
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
