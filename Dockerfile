@@ -56,4 +56,7 @@ RUN chmod -R 777 storage bootstrap/cache
 EXPOSE 10000
 
 # Commande de démarrage
-CMD php artisan serve --host 0.0.0.0 --port $PORT
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
