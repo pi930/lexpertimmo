@@ -55,8 +55,6 @@ RUN chmod -R 777 storage bootstrap/cache
 # Exposer le port Render
 EXPOSE 10000
 
-# Commande de démarrage
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Lancer Laravel
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
 
-CMD ["/entrypoint.sh"]
