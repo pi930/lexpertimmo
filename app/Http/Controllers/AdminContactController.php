@@ -8,25 +8,24 @@ class AdminContactController extends Controller
 {
     public function index()
     {
-        if (!Auth::check() || Auth::user()->role !== 'Admin') {
+        if (!Auth::check() || strtolower(Auth::user()->role) !== 'admin') {
             abort(403);
         }
 
         $messages = Contact::latest()->paginate(20);
         return view('admin.contact.index', compact('messages'));
     }
+
     public function destroy($id)
-{
-    if (!Auth::check() || Auth::user()->role !== 'Admin') {
-        abort(403);
+    {
+        if (!Auth::check() || strtolower(Auth::user()->role) !== 'admin') {
+            abort(403);
+        }
+
+        $message = Contact::findOrFail($id);
+        $message->delete();
+
+        return redirect()->route('admin.dashboard')
+                         ->with('success', 'Message supprimé avec succès.');
     }
-
-    $message = Contact::findOrFail($id);
-    $message->delete();
-
-    return redirect()->route('admin.dashboard')
-                     ->with('success', 'Message supprimé avec succès.');
-}
-
-    // Tu pourras ajouter ici : show(), reply(), archive(), destroy()…
 }

@@ -1,12 +1,22 @@
-<h2>Répondre à {{ $user->nom }}</h2>
-<p>Message original : {{ $message->contenu }}</p>
+@extends('layouts.app')
 
-<form action="{{ route('send.reply', $message->id) }}" method="POST">
-    @csrf
-    <input type="hidden" name="contact_id" value="{{ $message->id }}">
-    <input type="hidden" name="user_id" value="{{ $user->id }}">
-    <input type="hidden" name="admin" value="{{ $admin }}">
+@section('content')
+<div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
+    <h2 class="text-xl font-semibold mb-4">📨 Répondre à {{ $user->nom ?? 'Utilisateur' }}</h2>
 
-    <textarea name="reponse" class="w-full border p-2" rows="5" placeholder="Votre réponse..."></textarea>
-    <button type="submit" class="mt-2 bg-blue-600 text-white px-4 py-2">Envoyer</button>
-</form>
+    <p class="mb-4">
+        <strong>Message original :</strong><br>
+        {{ $message->message }}
+    </p>
+
+    <form action="{{ route('send.reply', $message->id) }}" method="POST">
+        @csrf
+
+        <textarea name="reponse" class="w-full border p-2 rounded" rows="5" placeholder="Votre réponse..."></textarea>
+
+        <button type="submit" class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Envoyer la réponse
+        </button>
+    </form>
+</div>
+@endsection

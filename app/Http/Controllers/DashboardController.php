@@ -21,34 +21,13 @@ public function index()
 {
     $user = Auth::user();
 
-    $messages = Message::where('user_id', $user->id)->latest()->paginate(10);
-    $coordonnees = $user->coordonnee ?? null;
-    $devis = Devis::where('user_id', $user->id)->latest()->paginate(10);
-    $admin = $user->role === 'Admin';
-    $rendezvous = Rendezvous::where('user_id', $user->id)->latest()->get();
+    if (strtolower($user->role) === 'admin') {
+        return redirect()->route('admin.rendezvous');
+    }
 
-    // ⚡ Charger les notifications (exemple : les 5 dernières)
-    $latestNotifications = Notification::latest()->take(5)->get();
-
-    // Utiliser l’adresse complète de l’utilisateur
-    $rue         = $coordonnees->rue ?? '';
-    $code_postal = $coordonnees->code_postal ?? '';
-    $ville       = $coordonnees->ville ?? 'Nice';
-    $travailHeure = 2; // durée par défaut
-
-    $service = new RendezvousService();
- $propositions = $service->genererPropositions(
-    $coordonnees->rue ?? '',
-    $coordonnees->code_postal ?? '',
-    $coordonnees->ville ?? 'Nice',
-    $travailHeure
-);
-
-
-    return view('Admin.dashboard_user', compact(
-        'messages','coordonnees','devis','user','admin','rendezvous','latestNotifications','propositions'
-    ));
+    return redirect()->route('user.dashboard', $user->id);
 }
+
 
     /**
      * Redirection principale après login
@@ -62,38 +41,40 @@ public function redirect()
 
 public function showUserDashboard($id)
 {
-    $user = User::findOrFail($id);
+    $user = Auth::user();
 
-    $messages = Message::where('user_id', $user->id)->latest()->paginate(10);
+    // Si c'est un admin → redirection vers dashboard admin
+    if (strtolower($user->role) === 'admin') {
+        return redirect()->route('admin.rendezvous');
+    }
+
+    if ($user->id != $id) {
+        abort(403);
+    }
+
+    // Reste du code utilisateur...
+    $messages = Contact::where('user_id', $user->id)->latest()->paginate(10);
     $coordonnees = $user->coordonnee ?? null;
     $devis = Devis::where('user_id', $user->id)->latest()->paginate(10);
     $rendezvous = Rendezvous::where('user_id', $user->id)->latest()->get();
+
+    $service = new RendezvousService();
+    $propositions = $service->genererPropositions(
+        $coordonnees->rue ?? '',
+        $coordonnees->code_postal ?? '',
+        $coordonnees->ville ?? 'Nice',
+        2
+    );
+
+    // 🔥 AJOUT ESSENTIEL
     $admin = false;
 
-    // ⚡ Toujours définir $propositions
-    $propositions = [];
-
-    if ($rendezvous->isEmpty()) {
-        $service = new RendezvousService();
-
-        // Utiliser la ville de l’utilisateur (ou coordonnees)
-        $zone = $coordonnees->ville ?? 'Nice';
-$travailHeure = 2; // durée par défaut
-
-$propositions = $service->genererPropositions(
-    $coordonnees->rue,
-    $coordonnees->code_postal,
-    $coordonnees->ville,
-    $travailHeure
-);
-
-
-    }
-
     return view('Admin.dashboard_user', compact(
-        'user','messages','coordonnees','devis','rendezvous','admin','propositions'
+        'user','messages','coordonnees','devis','rendezvous','propositions','admin'
     ));
 }
+
+
 
     /**
      * Vue du tableau de bord Admin
@@ -103,34 +84,43 @@ public function AdminDashboard()
 {
     $admin = Auth::user();
 
-    if (!$admin || $admin->role !== 'Admin') {
-        abort(403, 'Accès réservé aux Administrateurs');
+    if (strtolower($admin->role) !== 'admin') {
+        abort(403);
     }
 
-    // ⚠️ Ici tu dois définir $ $coordonnees = $admin->coordonnee; 
- $coordonnees = $admin->coordonnee; 
+    // Coordonnées de l’admin
+    $coordonnees = $admin->coordonnee;
+
+    // Tous les devis
     $devis = Devis::paginate(10);
-    $rendezvous = RendezVous::all();
+
+    // Tous les rendez-vous
+    $rendezvous = Rendezvous::all();
+
+    // ⚡ Messages de contact (admin)
     $messages = Contact::with('user')->latest()->paginate(10);
+
+    // Liste des devis avec relations
     $devisList = Devis::with('user')->latest()->paginate(10);
 
+    // Rendez-vous bloqués
+    $rendezvousBloques = Rendezvous::where('bloque', true)
+        ->with('user')
+        ->latest()
+        ->paginate(10);
+
+    // Notifications
     $latestNotifications = $admin->notifications()
         ->latest()
         ->take(5)
         ->get();
- // Récupérer les rendez-vous bloqués
-    $rendezvousBloques = Rendezvous::where('bloque', true)
-        ->with('user') // pour charger les infos utilisateur
-        ->latest()
-        ->paginate(10);
-
 
     $unreadCount = $admin->notifications()->unread()->count();
 
     return view('Admin.dashboard_Admin', [
         'admin' => $admin,
         'user' => $admin,
-        'coordonnees' => $coordonnees,   // ✅ ajouté
+        'coordonnees' => $coordonnees,
         'devis' => $devis,
         'rendezvous' => $rendezvous,
         'messages' => $messages,
@@ -138,16 +128,19 @@ public function AdminDashboard()
         'unreadCount' => $unreadCount,
         'devisList' => $devisList,
         'rendezvousBloques' => $rendezvousBloques,
-
     ]);
 }
+
+
+
+
 
 public function dashboard($id)
 {
     $user = Auth::user();
     
 
-    if ($user->id != $id && $user->role !== 'Admin') {
+    if ($user->id != $id && strtolower($user->role) !== 'admin') {
         abort(403, 'Accès interdit.');
     }
 
@@ -159,11 +152,10 @@ public function dashboardRoute()
 
     $coordonnees = $user->coordonnees;
     $messages = $user->messages()->latest()->paginate(10);
-    $devis = $user->role === 'Admin'
-        ? Devis::latest()->paginate(10)
-        : $user->devis()->latest()->paginate(10);
-
-    $admin = $user->role === 'Admin';
+    $devis = strtolower($user->role) === 'admin'
+    ? Devis::latest()->paginate(10)
+    : $user->devis()->latest()->paginate(10);
+    $admin = strtolower($user->role) === 'admin';
     $notifications = app(NotificationController::class)->latest();
     $rendezvous = Rendezvous::where('user_id', $user->id)
     ->latest()

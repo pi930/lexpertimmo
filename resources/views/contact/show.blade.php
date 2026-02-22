@@ -9,11 +9,26 @@
     </h2>
 
     <p><strong>Email :</strong> {{ $contact->email }}</p>
-    {{-- <p><strong>Téléphone :</strong> {{ $contact->telephone }}</p> --}}
-    <p><strong>Adresse :</strong> {{ $contact->rue }}, {{ $contact->code_postal }} {{ $contact->ville }}, {{ $contact->pays }}</p>
+
+    <p><strong>Adresse :</strong>
+        {{ $contact->rue }},
+        {{ $contact->code_postal }}
+        {{ $contact->ville }},
+        {{ $contact->pays }}
+    </p>
+
     <p><strong>Sujet :</strong> {{ $contact->sujet }}</p>
+
     <p><strong>Message :</strong><br>{{ $contact->message }}</p>
+
+    @if($contact->reponse)
+        <div class="mt-4 p-4 bg-green-100 text-green-800 rounded">
+            <strong>Réponse de l’admin :</strong><br>
+            {{ $contact->reponse }}
+        </div>
+    @endif
 
     <a href="{{ url()->previous() }}" class="inline-block mt-4 text-blue-600 hover:underline">← Retour</a>
 </div>
 @endsection
+

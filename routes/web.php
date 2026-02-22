@@ -178,7 +178,7 @@ Route::get('/devis/download/{id}', [DevisController::class, 'download'])
 
 
     // Contacts & messages
-    Route::middleware(['admin'])->group(function () {
+    Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/contact', [AdminContactController::class, 'index'])->name('contact.index');
     Route::get('/messages', [AdminContactController::class, 'index'])->name('messages.index');

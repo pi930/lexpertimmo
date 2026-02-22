@@ -7,10 +7,11 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <x-dashboard.summary
-                    :messages="$messages"
-                    :devis="$devis"
-                    :rendezvous="$rendezvous"
-                />
+    :messages="$messages"
+    :devis="$devisList"
+    :rendezvous="$rendezvousBloques"
+/>
+
             </div>
         </div>
     </div>

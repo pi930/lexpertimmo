@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    @if(auth()->user()->role === 'Admin')
+    @if(Auth::user()->role === 'admin')
     <div class="bg-white shadow rounded mb-6">
         <div class="px-6 py-4 flex items-center justify-between">
             <div>

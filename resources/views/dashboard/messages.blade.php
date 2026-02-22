@@ -19,7 +19,7 @@
 
                 {{-- Bouton Répondre + Réponse affichée --}}
                 @if(Auth::user()->role === 'admin')
-                    <a href="{{ route('Admin.contact.reply', ['id' => $message->id]) }}"
+                    <a href="{{ route('messages.reply', ['id' => $message->id]) }}">
                        class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                         ✉️ Répondre
                     </a>

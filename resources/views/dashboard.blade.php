@@ -10,7 +10,7 @@
 
     <div class="px-6 py-4">
         {{-- Vérification du rôle --}}
-        @if(Auth::user()->role === 'Admin')
+       @if(Auth::user()->role === 'admin')
             {{-- Section Admin --}}
             <h3 class="text-lg font-bold text-red-600">👑 Espace Administrateur</h3>
 

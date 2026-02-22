@@ -1,11 +1,10 @@
-<<nav class="bg-white border-b border-gray-200 shadow-md">
+<nav class="bg-white border-b border-gray-200 shadow-md">
     <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
 
-        <!-- Zone utilisateur (connecté uniquement) -->
         @auth
         <div class="flex items-center space-x-4 text-sm">
 
-            @if(Auth::user()->role === 'Admin' && isset($latestNotifications))
+            @if(strtolower(Auth::user()->role) === 'admin' && isset($latestNotifications))
                 <x-dashboard.notifications :notifications="$latestNotifications" />
             @endif
 
@@ -18,7 +17,6 @@
                 🏠 Accueil
             </a>
 
-            <!-- Déconnexion -->
             <form method="POST" action="{{ route('logout') }}" class="inline">
                 @csrf
                 <button type="submit"
@@ -30,7 +28,6 @@
         </div>
         @endauth
 
-        <!-- Menu principal -->
         <div class="flex flex-wrap md:flex-nowrap space-x-4 md:space-x-6 items-center font-semibold text-sm text-gray-800">
 
             @auth
@@ -39,10 +36,17 @@
                     🏠 Tableau de bord
                 </a>
 
-                <a href="{{ route('user.contact', ['id' => Auth::id()]) }}"
-                   class="px-3 py-2 rounded bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 transition">
-                    📬 Messages
-                </a>
+                @if(strtolower(Auth::user()->role) === 'admin')
+                    <a href="{{ route('admin.messages') }}"
+                       class="px-3 py-2 rounded bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 transition">
+                        📬 Messages
+                    </a>
+                @else
+                    <a href="{{ route('user.contact', ['id' => Auth::id()]) }}"
+                       class="px-3 py-2 rounded bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 transition">
+                        📬 Messages
+                    </a>
+                @endif
             @endauth
 
             @guest

@@ -27,24 +27,34 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($messages as $contact)
-                        <tr class="border-t hover:bg-gray-100">
-                            <td class="px-4 py-2">{{ $contact->nom }}</td>
-                            <td class="px-4 py-2">{{ $contact->email }}</td>
-                            <td class="px-4 py-2">{{ $contact->sujet }}</td>
-                            <td class="px-4 py-2">{{ Str::limit($contact->message, 80) }}</td>
-                            <td class="px-4 py-2">{{ $contact->created_at->format('d/m/Y H:i') }}</td>
-                            <td class="px-4 py-2 space-x-2">
-                                <a href="{{ route('contact.edit', $contact->id) }}" class="text-sm text-yellow-600 hover:underline">Modifier</a>
-                                <form action="{{ route('messages.destroy', $contact->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-sm text-red-600 hover:underline" onclick="return confirm('Supprimer ce message ?')">Supprimer</button>
-                                </form>
-                                <a href="{{ route('messages.reply', $contact->id) }}" class="text-sm text-blue-600 hover:underline">Répondre</a>
-                            </td>
-                        </tr>
-                    @endforeach
+                    @foreach($messages as $message)
+    <div class="mb-4 border-b pb-2">
+        <p><strong>Sujet :</strong> {{ $message->sujet }}</p>
+        <p><strong>Contenu :</strong> {{ $message->message }}</p>
+        <p><strong>Envoyé le :</strong> {{ $message->created_at->format('d/m/Y H:i') }}</p>
+
+        {{-- Bouton Répondre pour admin --}}
+        @if(Auth::user()->role === 'admin')
+            <a href="{{ route('messages.reply', ['id' => $message->id]) }}"
+               class="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                ✉️ Répondre
+            </a>
+
+            @if($message->reponse)
+                <div class="mt-2 p-3 bg-gray-50 border rounded">
+                    <p><strong>Réponse :</strong> {{ $message->reponse }}</p>
+                </div>
+            @endif
+
+        {{-- Pour l'utilisateur : afficher seulement la réponse --}}
+        @elseif($message->reponse)
+            <div class="mt-2 p-3 bg-green-50 border rounded">
+                <p><strong>Réponse de l’Administrateur :</strong> {{ $message->reponse }}</p>
+            </div>
+        @endif
+    </div>
+@endforeach
+
                 </tbody>
             </table>
             <div class="bg-blue-100 text-blue-800 p-4 rounded">
