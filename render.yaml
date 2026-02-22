@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: lexpertimmo
+    env: docker
+    plan: starter
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://lexpertimmo.onrender.com
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        fromDatabase:
+          name: lexpertimmo-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: lexpertimmo-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: lexpertimmo-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: lexpertimmo-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: lexpertimmo-db
+          property: password
+
+databases:
+  - name: lexpertimmo-db
+    plan: free
+    region: frankfurt
+
+jobs:
+  - name: migrate
+    type: cron
+    schedule: "0 0 * * *"
+    env: docker
+    dockerfilePath: ./Dockerfile
+    command: php artisan migrate --force
+    region: frankfurt
+
