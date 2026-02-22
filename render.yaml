@@ -14,7 +14,7 @@ services:
       - key: APP_URL
         value: https://lexpertimmo.onrender.com
       - key: DB_CONNECTION
-        value: mysql
+        value: pgsql
       - key: DB_HOST
         fromDatabase:
           name: lexpertimmo-db
