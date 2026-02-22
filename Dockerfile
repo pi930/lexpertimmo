@@ -57,4 +57,5 @@ EXPOSE 10000
 
 # Lancer Laravel
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
+# Dockerfile updated to force rebuild
 
