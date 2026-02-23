@@ -15,12 +15,10 @@ RUN npm run build
 # -----------------------------
 # 2) PHP-FPM pour Laravel
 # -----------------------------
-FROM php:8.2-fpm
+FROM php:8.2-fpm AS php
 
-# IMPORTANT : permettre à PHP-FPM de lire les variables Render
 ENV PHP_FPM_CLEAR_ENV=no
 
-# Dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -31,33 +29,37 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev
 
-# Extensions PHP
 RUN docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath
 
-# Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Dossier de travail
 WORKDIR /var/www/html
 
-# Copier le code Laravel
 COPY . .
-
-# Copier les assets buildés
 COPY --from=build-assets /app/public/build ./public/build
 
-# Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Préparer Laravel
 RUN php artisan storage:link || true
-
-# Permissions
 RUN chmod -R 777 storage bootstrap/cache
 
-# Exposer le port Render
+
+# -----------------------------
+# 3) Nginx + PHP-FPM
+# -----------------------------
+FROM nginx:alpine
+
+# Copier la config Nginx
+COPY ./nginx.conf /etc/nginx/nginx.conf
+
+# Copier Laravel et PHP-FPM
+COPY --from=php /var/www/html /var/www/html
+COPY --from=php /usr/local/etc/php-fpm.d /usr/local/etc/php-fpm.d
+COPY --from=php /usr/local/sbin/php-fpm /usr/local/sbin/php-fpm
+
+WORKDIR /var/www/html
+
 EXPOSE 10000
 
-# Lancer PHP-FPM sur le port 10000
-CMD ["php-fpm", "-F", "--nodaemonize", "--fpm-config", "/usr/local/etc/php-fpm.conf"]
+CMD php-fpm -D && nginx -g "daemon off;"
 
