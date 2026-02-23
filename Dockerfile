@@ -57,6 +57,12 @@ RUN chmod -R 777 storage bootstrap/cache
 # Copier config Nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 
+RUN mkdir -p storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views && \
+    chmod -R 777 storage/framework
+
+
 # Exposer le port Render
 EXPOSE 10000
 
