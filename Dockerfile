@@ -13,9 +13,12 @@ RUN npm run build
 
 
 # -----------------------------
-# 2) Image PHP pour Laravel
+# 2) PHP-FPM pour Laravel
 # -----------------------------
-FROM php:8.2-cli
+FROM php:8.2-fpm
+
+# IMPORTANT : permettre à PHP-FPM de lire les variables Render
+ENV PHP_FPM_CLEAR_ENV=no
 
 # Dépendances système
 RUN apt-get update && apt-get install -y \
@@ -29,7 +32,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev
 
 # Extensions PHP
-RUN docker-php-ext-install pdo pdo_pgsql pdo_mysql mbstring zip exif pcntl bcmath
+RUN docker-php-ext-install pdo pdo_pgsql mbstring zip exif pcntl bcmath
 
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -55,7 +58,6 @@ RUN chmod -R 777 storage bootstrap/cache
 # Exposer le port Render
 EXPOSE 10000
 
-# Lancer Laravel
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
-# Dockerfile updated to force rebuild
+# Lancer PHP-FPM sur le port 10000
+CMD ["php-fpm", "-F", "--nodaemonize", "--fpm-config", "/usr/local/etc/php-fpm.conf"]
 
