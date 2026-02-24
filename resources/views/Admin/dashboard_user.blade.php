@@ -84,17 +84,20 @@
         <h3>Choisissez un rendez-vous :</h3>
         @foreach($propositions as $rdv)
             <form action="{{ route('rendezvous.reserver') }}" method="POST" class="mb-2">
-                @csrf
-                <input type="hidden" name="zone" value="{{ $rdv['zone'] }}">
-                <input type="hidden" name="date" value="{{ $rdv['date'] }}">
-                <input type="hidden" name="travail_heure" value="{{ $rdv['travail_heure'] }}">
-                <input type="hidden" name="rue" value="{{ $coordonnees->rue ?? '' }}">
-<input type="hidden" name="code_postal" value="{{ $coordonnees->code_postal ?? '' }}">
-<input type="hidden" name="ville" value="{{ $coordonnees->ville ?? '' }}">
-                <button type="submit" class="btn btn-primary">
-                    {{ $rdv['ville'] }} — {{ $rdv['date']->format('d/m/Y H:i') }}
-                </button>
-            </form>
+    @csrf
+    <input type="hidden" name="zone" value="{{ $rdv['zone'] }}">
+    <input type="hidden" name="date" value="{{ $rdv['date'] }}">
+    <input type="hidden" name="travail_heure" value="{{ $rdv['travail_heure'] }}">
+
+    <input type="hidden" name="rue" value="{{ $coordonnees->rue ?? '' }}">
+    <input type="hidden" name="code_postal" value="{{ $coordonnees->code_postal ?? '' }}">
+    <input type="hidden" name="ville" value="{{ $coordonnees->ville ?? '' }}">
+
+    <button type="submit" class="btn btn-primary">
+        {{ $coordonnees->ville ?? '' }} — {{ $rdv['date']->format('d/m/Y H:i') }}
+    </button>
+</form>
+
         @endforeach
     @endif
 @else
