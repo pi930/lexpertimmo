@@ -88,9 +88,9 @@
                 <input type="hidden" name="zone" value="{{ $rdv['zone'] }}">
                 <input type="hidden" name="date" value="{{ $rdv['date'] }}">
                 <input type="hidden" name="travail_heure" value="{{ $rdv['travail_heure'] }}">
-                <input type="hidden" name="rue" value="{{ $rdv['rue'] }}">
-                <input type="hidden" name="code_postal" value="{{ $rdv['code_postal'] }}">
-                <input type="hidden" name="ville" value="{{ $rdv['ville'] }}">
+                <input type="hidden" name="rue" value="{{ $coordonnees->rue ?? '' }}">
+<input type="hidden" name="code_postal" value="{{ $coordonnees->code_postal ?? '' }}">
+<input type="hidden" name="ville" value="{{ $coordonnees->ville ?? '' }}">
                 <button type="submit" class="btn btn-primary">
                     {{ $rdv['ville'] }} — {{ $rdv['date']->format('d/m/Y H:i') }}
                 </button>
