@@ -3,37 +3,87 @@
 namespace App\Services;
 
 use App\Models\Rendezvous;
+use App\Models\Zone;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 
 class RendezvousService
 {
-public function genererPropositions($rue, $code_postal, $ville, $travailHeure)
+    public function genererPropositions($rue, $code_postal, $ville, $travailHeure)
     {
-        // Valeur par défaut si aucune durée n’est fournie
         $travailHeure = $travailHeure ?? 1;
 
-        // Point de départ : maintenant
-        $start = Carbon::now();
+        // 1) Déterminer la zone la plus proche
+        $zone = $this->trouverZoneProche($rue, $code_postal, $ville);
 
-        // Générer 3 propositions espacées
+        // 2) Générer des créneaux intelligents
+        return $this->genererCreneauxDisponibles($zone, $travailHeure);
+    }
+
+    private function trouverZoneProche($rue, $code_postal, $ville)
+    {
+        $adresse = "$rue $code_postal $ville";
+
+        $response = \Http::get("https://maps.googleapis.com/maps/api/geocode/json", [
+            'address' => $adresse,
+            'key'     => config('services.google_maps.key'),
+        ]);
+
+        if (empty($response['results'][0]['geometry']['location'])) {
+            return Zone::first(); // fallback
+        }
+
+        $lat = $response['results'][0]['geometry']['location']['lat'];
+        $lng = $response['results'][0]['geometry']['location']['lng'];
+
+        $zones = Zone::all();
+        $zoneProche = null;
+        $minDistance = PHP_INT_MAX;
+
+        foreach ($zones as $zone) {
+            $distance = $this->distanceKm($lat, $lng, $zone->latitude, $zone->longitude);
+            if ($distance < $minDistance) {
+                $minDistance = $distance;
+                $zoneProche = $zone;
+            }
+        }
+
+        return $zoneProche;
+    }
+
+    private function genererCreneauxDisponibles($zone, $travailHeure)
+    {
         $propositions = [];
+        $start = Carbon::now()->addHour(); // premier créneau possible
 
-        for ($i = 1; $i <= 3; $i++) {
-            $dateDebut = $start->copy()->addHours($i); // créneau à +1h, +2h, +3h
-            $dateFin   = $dateDebut->copy()->addHours($travailHeure);
+        // On génère 3 créneaux valides
+        while (count($propositions) < 3) {
 
-            $propositions[] = [
-                'zone'          => "Zone $i",
-                'date'          => $dateDebut,
-                'date_fin'      => $dateFin,
-                'travail_heure' => $travailHeure,
-                'rue'           => $rue,
-                'code_postal'   => $code_postal,
-                'ville'         => $ville,
-            ];
+            // Respect des horaires (8h–18h)
+            if ($start->hour < 8) $start->setHour(8);
+            if ($start->hour >= 18) $start->addDay()->setHour(8);
+
+            $dateFin = $start->copy()->addHours($travailHeure);
+
+            // Vérifier si un RDV existe déjà dans cette zone
+            $collision = Rendezvous::where('zone', $zone->nom)
+                ->where(function ($q) use ($start, $dateFin) {
+                    $q->whereBetween('date', [$start, $dateFin])
+                      ->orWhereBetween(DB::raw("DATE_ADD(date, INTERVAL travail_heure HOUR)"), [$start, $dateFin]);
+                })
+                ->where('bloque', true)
+                ->exists();
+
+            if (!$collision) {
+                $propositions[] = [
+                    'zone'          => $zone->nom,
+                    'date'          => $start->copy(),
+                    'date_fin'      => $dateFin,
+                    'travail_heure' => $travailHeure,
+                ];
+            }
+
+            $start->addHour();
         }
 
         return $propositions;
@@ -41,16 +91,14 @@ public function genererPropositions($rue, $code_postal, $ville, $travailHeure)
 
     private function distanceKm($lat1, $lon1, $lat2, $lon2)
     {
-        $earthRadius = 6371; // km
+        $earthRadius = 6371;
         $dLat = deg2rad($lat2 - $lat1);
         $dLon = deg2rad($lon2 - $lon1);
 
-        $a = sin($dLat/2) * sin($dLat/2) +
+        $a = sin($dLat/2) ** 2 +
              cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-             sin($dLon/2) * sin($dLon/2);
+             sin($dLon/2) ** 2;
 
-        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-        return $earthRadius * $c;
+        return $earthRadius * 2 * atan2(sqrt($a), sqrt(1-$a));
     }
 }
-
