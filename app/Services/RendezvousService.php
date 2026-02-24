@@ -69,7 +69,10 @@ class RendezvousService
             $collision = Rendezvous::where('zone', $zone->nom)
                 ->where(function ($q) use ($start, $dateFin) {
                     $q->whereBetween('date', [$start, $dateFin])
-                      ->orWhereBetween(DB::raw("DATE_ADD(date, INTERVAL travail_heure HOUR)"), [$start, $dateFin]);
+                      ->orWhereBetween(
+    DB::raw("date + (travail_heure || ' hour')::interval"),
+    [$start, $dateFin]
+);
                 })
                 ->where('bloque', true)
                 ->exists();
