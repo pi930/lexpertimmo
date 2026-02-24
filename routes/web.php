@@ -133,7 +133,6 @@ Route::get('/user/contact/{id}', [ContactController::class, 'showUserMessages'])
 
     // Devis
     Route::get('/devis', [DevisController::class, 'index'])->name('devis.index');
-    Route::get('/devis/{id}', [DevisController::class, 'show'])->name('devis.show');
     Route::delete('/devis/{id}', [DevisController::class, 'destroy'])->name('devis.destroy');
     Route::post('/devis/send', [DevisController::class, 'sendDevisEmail'])->name('devis.send');
   Route::get('/devis/formulaire', function () {
@@ -141,7 +140,7 @@ Route::get('/user/contact/{id}', [ContactController::class, 'showUserMessages'])
 })->name('devis.formulaire');
     Route::post('/devis/generer', [DevisController::class, 'generer'])->name('devis.generer');
     Route::post('/devis/calculer', [DevisController::class, 'calculer'])->name('devis.calculer');
-    
+    Route::get('/devis/{id}', [DevisController::class, 'show'])->name('devis.show');
 
 // 🛡️ Admin
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
