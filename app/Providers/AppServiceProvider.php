@@ -20,6 +20,13 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void { View::composer('layouts.navigation', AdminNotificationComposer::class); // Force HTTPS en production if (config('app.env') === 'production') { URL::forceScheme('https'); } }
-}
+    public function boot(): void
+    {
+        View::composer('layouts.navigation', AdminNotificationComposer::class);
+
+        // Force HTTPS en production
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+    }
 }
