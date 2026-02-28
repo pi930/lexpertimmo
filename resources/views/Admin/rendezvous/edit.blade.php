@@ -27,7 +27,7 @@
 
         <div>
             <label class="block font-medium">Date</label>
-            <input type="date" name="date" value="{{ $rdv->date }}"
+            <input type="datetime-local" name="date" value="{{ $rdv->date->format('Y-m-d\TH:i') }}">
                    class="border p-2 w-full rounded">
         </div>
 
