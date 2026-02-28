@@ -19,16 +19,16 @@
             </style>
         @endif
     </head>
-    <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-6 lg:p-8 items-center lg:justify-center min-h-screen flex-col">
-  <header class="w-full lg:max-w-4xl max-w-[335px] text-sm mb-6 not-has-[nav]:hidden">
+    <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] p-6 lg:p-8 min-h-screen flex flex-col">
+  <header class="w-full max-w-full lg:max-w-4xl text-sm mb-6 not-has-[nav]:hidden">
  @if (Route::has('login'))
-  <nav class="flex items-center justify-end gap-4">
-  <!-- Bandeau bleu blanc rouge -->
-<div class="w-full flex h-3">
-    <div class="flex-1 bg-blue-600"></div>
-    <div class="flex-1 bg-white"></div>
-    <div class="flex-1 bg-red-600"></div>
-</div>
+  <nav class="w-full">
+    <div class="w-full flex h-3">
+        <div class="flex-1 bg-blue-600"></div>
+        <div class="flex-1 bg-white"></div>
+        <div class="flex-1 bg-red-600"></div>
+    </div>
+</nav>
 
 <!-- Section Présentation -->
 <section class="max-w-4xl mx-auto mt-10 px-6 text-center">

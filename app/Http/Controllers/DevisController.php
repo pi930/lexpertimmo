@@ -244,56 +244,43 @@ DevisLigne::create([
 
     // 6) Générer et sauvegarder le PDF
     // Assure-toi que storage/app/private/devis existe et que le disk 'devis_private' pointe dessus si tu l'utilises
-    $pdf = Pdf::loadView('devis.template', compact(
-        'typeBien', 'surface', 'options', 'prixTotal', 'user', 'prestations'
-    ));
+    $// Générer le PDF
+$pdf = Pdf::loadView('devis.template', compact(
+    'typeBien', 'surface', 'options', 'prixTotal', 'user', 'prestations'
+));
 
-    Storage::disk('devis_private')->put($filename, $pdf->output());
+// Stocker le PDF en base64 dans la base
+$devis->pdf_path = $filename; // nom du fichier
+$devis->pdf_content = base64_encode($pdf->output()); // contenu PDF encodé
+$devis->save();
 
+// Envoyer l’email
+Mail::to($devis->email)->send(new DevisCree($devis));
 
-    // 7) Envoyer l’email
-    Mail::to($devis->email)->send(new DevisCree($devis));
-
-    return redirect()->route('dashboard')->with([
-        'success'    => '✅ Votre devis a été créé et envoyé !',
-        'devis_link' => route('devis.download', $devis->id),
-    ]);
+// Redirection vers le dashboard
+return redirect()->route('dashboard')->with([
+    'success'    => '✅ Votre devis a été créé et envoyé !',
+    'devis_link' => route('devis.download', $devis->id),
+]);
+    }
 }
-}
+
 public function download($id)
 {
-   logger(Auth::user()->role);
-
     $devis = Devis::findOrFail($id);
+    $user = Auth::user();
 
     // Vérification des droits (propriétaire ou admin)
-    $user = Auth::user();
     if ($user->id !== $devis->user_id && $user->role !== 'Admin') {
         abort(403, 'Accès refusé');
     }
 
-    return Storage::disk('devis_private')->download($devis->pdf_path);
-}// Dans ton controller
-public function index()
-{
-    $user = Auth::user();
-
-    if ($user->role === 'Admin') {
-        // Admin voit tous les devis avec leurs lignes et objets
-        $devisList = Devis::with('devisLignes.objet', 'user')->latest()->paginate(10);
-    } else {
-        // Utilisateur voit uniquement ses devis
-        $devisList = Devis::with('devisLignes.objet')
-                          ->where('user_id', $user->id)
-                          ->latest()
-                          ->paginate(10);
-    }
-
-    return view('dashboard.devis', [
-        'devis' => $devisList, // collection paginée
-        'admin' => $user->role === 'Admin'
-    ]);
+    // Télécharger le PDF stocké en base64
+    return response(base64_decode($devis->pdf_content))
+        ->header('Content-Type', 'application/pdf')
+        ->header('Content-Disposition', 'attachment; filename="'.$devis->pdf_path.'"');
 }
+
 private function calculerPrixOption(string $opt, string $typeBien, string $surface): int
 {
     return match($opt) {
