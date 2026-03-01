@@ -7,7 +7,7 @@
 <form action="{{ route('admin.rendezvous.update', $rdv->id) }}" method="POST">
     @csrf
     @method('PUT')
-
+    
     <label>Date :</label>
     <input type="datetime-local" name="date" value="{{ $rdv->date->format('Y-m-d\TH:i') }}">
 

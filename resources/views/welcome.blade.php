@@ -20,15 +20,15 @@
         @endif
     </head>
     <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] p-6 lg:p-8 min-h-screen flex flex-col">
-  <header class="w-full max-w-full lg:max-w-4xl text-sm mb-6 not-has-[nav]:hidden">
- @if (Route::has('login'))
-  <nav class="w-full">
-    <div class="w-full flex h-3">
-        <div class="flex-1 bg-blue-600"></div>
-        <div class="flex-1 bg-white"></div>
-        <div class="flex-1 bg-red-600"></div>
-    </div>
-</nav>
+  <header class="w-full max-w-full lg:max-w-4xl text-sm mb-6">
+    @if (Route::has('login'))
+        <nav class="w-full flex">
+            <div class="flex-1 bg-blue-600 h-3"></div>
+            <div class="flex-1 bg-white h-3"></div>
+            <div class="flex-1 bg-red-600 h-3"></div>
+        </nav>
+    @endif
+</header>
 
 <!-- Section Présentation -->
 <section class="max-w-4xl mx-auto mt-10 px-6 text-center">
