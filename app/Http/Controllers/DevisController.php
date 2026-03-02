@@ -199,15 +199,6 @@ public function generer(Request $request, $prestationId = null)
 
     $devis->save();
 
-    // 3) Ajouter les lignes principales
-    DevisLigne::create([
-        'devis_id'         => $devis->id,
-        'designation'      => "Diagnostics obligatoires {$typeBien} - {$surface}",
-        'quantite'         => 1,
-        'prix_unitaire_ht' => $prixTotal,
-        'tva'              => 20,
-        'total_ttc'        => $prixTotal,
-    ]);
 
     // 4) Attacher les prestations via les options
     $labels = [
@@ -221,47 +212,44 @@ public function generer(Request $request, $prestationId = null)
     ];
 
     foreach ($options as $opt) {
-        $prixOption = $this->calculerPrixOption($opt, $typeBien, $surface);
+    $prixOption = $this->calculerPrixOption($opt, $typeBien, $surface);
 
-       // 3) Ajouter les lignes principales
-DevisLigne::create([
-    'devis_id'         => $devis->id,
-    'designation'      => "Diagnostics obligatoires {$typeBien} - {$surface}",
-    'quantite'         => 1,
-    'prix_unitaire_ht' => $prixTotal,
-    'tva'              => 20,
-    'total_ttc'        => $prixTotal,
-]);
+    DevisLigne::create([
+        'devis_id'         => $devis->id,
+        'designation'      => $labels[$opt] ?? $opt,
+        'quantite'         => 1,
+        'prix_unitaire_ht' => $prixOption,
+        'tva'              => 20,
+        'total_ttc'        => $prixOption,
+    ]);
+
+
 
 
     // 5) Récupérer les prestations attachées (variable AU PLURIEL)
     $prestations = $devis->prestations()->get()->map(function ($p) {
-        return [
-            'nom'  => $p->titre,
-            'prix' => $p->pivot->total_ttc ?? $p->prix,
-        ];
-    });
+    return [
+        'nom'  => $p->titre,
+        'prix' => $p->pivot->total_ttc ?? $p->prix,
+    ];
+});
 
-    // 6) Générer et sauvegarder le PDF
-    // Assure-toi que storage/app/private/devis existe et que le disk 'devis_private' pointe dessus si tu l'utilises
-    $// Générer le PDF
+// Générer le PDF
 $pdf = Pdf::loadView('devis.template', compact(
     'typeBien', 'surface', 'options', 'prixTotal', 'user', 'prestations'
 ));
 
-// Stocker le PDF en base64 dans la base
-$devis->pdf_path = $filename; // nom du fichier
-$devis->pdf_content = base64_encode($pdf->output()); // contenu PDF encodé
+$devis->pdf_path = $filename;
+$devis->pdf_content = base64_encode($pdf->output());
 $devis->save();
 
-// Envoyer l’email
 Mail::to($devis->email)->send(new DevisCree($devis));
 
-// Redirection vers le dashboard
 return redirect()->route('dashboard')->with([
-    'success'    => '✅ Votre devis a été créé et envoyé !',
+    'success'    => 'Votre devis a été créé et envoyé !',
     'devis_link' => route('devis.download', $devis->id),
 ]);
+
     }
 }
 
