@@ -12,13 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
 
-    // Alias pour middlewares personnalisés
-    $middleware->alias([
-        'admin' => \App\Http\Middleware\AdminMiddleware::class,
-    ]);
+        // Alias pour middlewares personnalisés
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\Admin::class,
+        ]);
 
-})
-
+    }) // <-- CE POINT-VIRGULE EST ESSENTIEL
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->create();
