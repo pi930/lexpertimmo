@@ -28,8 +28,8 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev
 
-# Extensions PHP
-RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+# Extensions PHP (IMPORTANT : ajout de pdo_pgsql)
+RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl bcmath
 
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -43,7 +43,7 @@ COPY . .
 # Copier les assets buildés
 COPY --from=build-assets /app/public/build ./public/build
 
-# Base SQLite
+# Base SQLite (optionnel)
 RUN mkdir -p database && touch database/database.sqlite
 
 # Dépendances PHP
@@ -65,4 +65,3 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 10000
 
 CMD ["/entrypoint.sh"]
-
