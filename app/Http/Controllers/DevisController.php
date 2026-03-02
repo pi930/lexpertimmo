@@ -14,6 +14,7 @@ use App\Models\DevisLigne;
 use App\Models\Objet;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Http; // ⚡ à ajouter en haut
+use Illuminate\Support\Facades\DB;
 
 class DevisController extends Controller
 {  // Dans ton controller
@@ -201,17 +202,17 @@ public function generer(Request $request, $prestationId = null)
 
 
     // 4) Attacher les prestations via les options
-    $labels = [
-        'gaz_cuisson'              => 'Gaz cuisson',
-        'gaz_chaudiere'            => 'Gaz chaudière',
-        'plomb'                    => 'Plomb (maison < 1949)',
-        'zone_non_habitable_50'   => 'Zone non habitable < 50m²',
-        'zone_non_habitable_100'  => 'Zone non habitable < 100m²',
-        'zone_non_habitable_150'  => 'Zone non habitable < 150m²',
-        'zone_non_habitable_200'  => 'Zone non habitable < 200m²',
-    ];
+$labels = [
+    'gaz_cuisson'              => 'Gaz cuisson',
+    'gaz_chaudiere'            => 'Gaz chaudière',
+    'plomb'                    => 'Plomb (maison < 1949)',
+    'zone_non_habitable_50'   => 'Zone non habitable < 50m²',
+    'zone_non_habitable_100'  => 'Zone non habitable < 100m²',
+    'zone_non_habitable_150'  => 'Zone non habitable < 150m²',
+    'zone_non_habitable_200'  => 'Zone non habitable < 200m²',
+];
 
-    foreach ($options as $opt) {
+foreach ($options as $opt) {
     $prixOption = $this->calculerPrixOption($opt, $typeBien, $surface);
 
     DevisLigne::create([
@@ -222,19 +223,18 @@ public function generer(Request $request, $prestationId = null)
         'tva'              => 20,
         'total_ttc'        => $prixOption,
     ]);
+} // ←←← IMPORTANT : fermeture du foreach
 
 
-
-
-    // 5) Récupérer les prestations attachées (variable AU PLURIEL)
-    $prestations = $devis->prestations()->get()->map(function ($p) {
+// 5) Récupérer les prestations attachées
+$prestations = $devis->prestations()->get()->map(function ($p) {
     return [
         'nom'  => $p->titre,
         'prix' => $p->pivot->total_ttc ?? $p->prix,
     ];
 });
 
-// Générer le PDF
+// 6) Générer le PDF
 $pdf = Pdf::loadView('devis.template', compact(
     'typeBien', 'surface', 'options', 'prixTotal', 'user', 'prestations'
 ));
@@ -243,30 +243,14 @@ $devis->pdf_path = $filename;
 $devis->pdf_content = base64_encode($pdf->output());
 $devis->save();
 
+// 7) Envoyer l’email
 Mail::to($devis->email)->send(new DevisCree($devis));
 
+// 8) Redirection
 return redirect()->route('dashboard')->with([
     'success'    => 'Votre devis a été créé et envoyé !',
     'devis_link' => route('devis.download', $devis->id),
 ]);
-
-    }
-}
-
-public function download($id)
-{
-    $devis = Devis::findOrFail($id);
-    $user = Auth::user();
-
-    // Vérification des droits (propriétaire ou admin)
-    if ($user->id !== $devis->user_id && $user->role !== 'Admin') {
-        abort(403, 'Accès refusé');
-    }
-
-    // Télécharger le PDF stocké en base64
-    return response(base64_decode($devis->pdf_content))
-        ->header('Content-Type', 'application/pdf')
-        ->header('Content-Disposition', 'attachment; filename="'.$devis->pdf_path.'"');
 }
 
 private function calculerPrixOption(string $opt, string $typeBien, string $surface): int
