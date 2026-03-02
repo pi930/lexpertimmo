@@ -1,5 +1,7 @@
 {{-- resources/views/dashboard.blade.php --}}
-<x-app-layout>
+@extends('layouts.app')
+
+@section('content')
 {{-- Dashboard --}}
 <div class="bg-white shadow rounded">
     <div class="px-6 py-4 border-b border-gray-200">
@@ -76,4 +78,5 @@
         @endif
     </div>
 </div>
-</x-app-layout>
+
+@endsection
