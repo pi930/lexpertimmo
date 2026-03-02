@@ -81,11 +81,12 @@ public function showUserDashboard($id)
 $travailHeure = 2; // durée par défaut
 
 $propositions = $service->genererPropositions(
-    $coordonnees->rue,
-    $coordonnees->code_postal,
-    $coordonnees->ville,
+    $coordonnees->rue ?? '',
+    $coordonnees->code_postal ?? '',
+    $coordonnees->ville ?? 'Nice',
     $travailHeure
 );
+
 
 
     }
