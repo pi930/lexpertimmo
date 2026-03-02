@@ -80,8 +80,9 @@ public function dashboardView()
 public function dashboardLink(): string
 {
     return $this->role === 'Admin'
-        ? route('admin.dashboard')
+        ? route('Admin.dashboard_Admin')
         : route('user.dashboard', ['id' => $this->id]);
 }
+
 
 }
