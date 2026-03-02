@@ -27,8 +27,7 @@ public function build()
         throw new \Exception("L'utilisateur lié au devis est introuvable.");
     }
 
-    // Récupère le chemin complet depuis le disk privé
-    $pdfPath = Storage::disk('devis_private')->path($this->devis->pdf_path);
+    $pdfPath = storage_path('app/private/devis/' . $this->devis->pdf_path);
 
     return $this->subject('Merci pour votre devis chez Lexpertimmobilier')
                 ->attach($pdfPath, [
@@ -47,4 +46,5 @@ public function build()
                     ),
                 ]);
 }
+
 }

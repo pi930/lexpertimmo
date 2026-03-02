@@ -35,10 +35,7 @@ return [
             'throw' => false,
             'report' => false,
         ],
-    'devis_private' => [
-        'driver' => 'local',
-        'root' => storage_path('app/private/devis'),
-    ],
+    'devis_private' => [ 'driver' => 'local', 'root' => storage_path('app/private/devis'), 'visibility' => 'private', ],
 
 
 
