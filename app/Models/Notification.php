@@ -15,18 +15,17 @@ class Notification extends Model
         'type',
         'content',
         'url',
-        'read',
+        'read_at',
     ];
 
-    // 🔗 Relation avec l'Admin(User)
     public function Admin()
     {
         return $this->belongsTo(User::class, 'admin_id');
     }
 
-    // ✅ Scope pour récupérer les notifications non lues
+    // Notifications non lues = read_at NULL
     public function scopeUnread($query)
     {
-        return $query->where('read', false);
+        return $query->whereNull('read_at');
     }
 }
