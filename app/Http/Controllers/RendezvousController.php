@@ -147,7 +147,8 @@ public function edit($id)
 {
     $rdv = Rendezvous::findOrFail($id);
 
-    return view('Admin.rendezvous_edit', compact('rdv'));
+    return view('Admin.rendezvous.edit', compact('rdv'));
+
 }
 
 
