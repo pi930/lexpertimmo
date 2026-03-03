@@ -136,11 +136,15 @@ public function reserver(Request $request)
     // Tu peux aussi charger les messages si ton dashboard admin en a besoin
     $messages = Message::latest()->paginate(10);
 
-    return view('Admin.dashboard_Admin', compact(
-        'rendezvousBloques',
-        'devisList',
-        'messages'
-    ));
+    $rendezvous = $rendezvousBloques; // pour correspondre à la vue
+$devis = $devisList; // pour correspondre à la vue
+
+return view('Admin.dashboard_Admin', compact(
+    'rendezvous',
+    'devis',
+    'messages'
+));
+
 }
 
 public function edit($id)
