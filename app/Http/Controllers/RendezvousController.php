@@ -121,29 +121,33 @@ public function reserver(Request $request)
     }
 
 
- public function indexAdmin()
+public function indexAdmin()
 {
     // Tous les rendez-vous bloqués
     $rendezvousBloques = Rendezvous::where('bloque', true)
                                    ->latest()
                                    ->paginate(15);
 
-    // Tous les devis (avec pagination pour éviter de charger trop d'entrées d'un coup)
-    $devisList = Devis::with(['user', 'devisLignes.objet']) // ⚡ eager loading pour éviter N+1
+    // Tous les devis
+    $devisList = Devis::with(['user', 'devisLignes.objet'])
                       ->latest()
                       ->paginate(15);
 
-    // Tu peux aussi charger les messages si ton dashboard admin en a besoin
+    // Messages
     $messages = Message::latest()->paginate(10);
 
-    $rendezvous = $rendezvousBloques; // pour correspondre à la vue
-$devis = $devisList; // pour correspondre à la vue
+    // Harmonisation pour la vue
+    $rendezvous = $rendezvousBloques;
+    $devis = $devisList;
 
-return view('Admin.dashboard_Admin', compact(
-    'rendezvous',
-    'devis',
-    'messages'
-));
+    return view('Admin.dashboard_Admin', compact(
+        'rendezvousBloques',
+        'devisList',
+        'messages',
+        'rendezvous',
+        'devis'
+    ));
+}
 
 }
 
