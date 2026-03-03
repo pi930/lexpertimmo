@@ -147,7 +147,7 @@ public function indexAdmin()
         'rendezvous',
         'devis'
     ));
-}
+
 
 }
 
