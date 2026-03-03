@@ -239,11 +239,18 @@ $pdf = Pdf::loadView('devis.template', compact(
     'typeBien', 'surface', 'options', 'prixTotal', 'user', 'prestations'
 ));
 
-$pdf->save(storage_path('app/private/devis/' . $filename)); // ← OBLIGATOIRE
+// S'assurer que le dossier existe
+$path = storage_path('app/private/devis');
+if (!file_exists($path)) {
+    mkdir($path, 0775, true);
+}
+
+$pdf->save($path . '/' . $filename);
 
 $devis->pdf_path = $filename;
 $devis->pdf_content = base64_encode($pdf->output());
 $devis->save();
+
 
 
 // 7) Envoyer l’email
