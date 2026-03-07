@@ -52,7 +52,7 @@ public function store(Request $request)
 
     Coordonnee::create($validated);
 
-    return redirect()->route('dashboard.user')->with('success', 'Coordonnées enregistrées.');
+    return redirect()->route('user.dashboard')->with('success', 'Coordonnées enregistrées.');
 }
 
 
@@ -72,6 +72,6 @@ public function update(Request $request, $id)
 
     $coordonnees->update($validated);
 
-    return redirect()->route('dashboard.user')->with('success', 'Coordonnées mises à jour.');
+    return redirect()->route('user.dashboard')->with('success', 'Coordonnées mises à jour.');
 }
 }
