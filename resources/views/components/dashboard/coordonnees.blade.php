@@ -9,13 +9,13 @@
 
     @if($coordonnees)
         <div class="bg-white p-6 rounded shadow">
-            <p><strong>Nom :</strong> {{ $coordonnees->last_name }}</p>
-            <p><strong>Rue :</strong> {{ $coordonnees->rue }}</p>
-            <p><strong>Email :</strong> {{ $coordonnees->email }}</p>
-            <p><strong>Téléphone :</strong> {{ $coordonnees->telephone }}</p>
-            <p><strong>Code postal :</strong> {{ $coordonnees->code_postale }}</p>
-            <p><strong>Ville :</strong> {{ $coordonnees->ville }}</p>
-            <p><strong>Pays :</strong> {{ $coordonnees->Pays }}</p>
+            <p><strong>Nom :</strong> {{ $coordonnees->nom }}</p>
+<p><strong>Rue :</strong> {{ $coordonnees->rue }}</p>
+<p><strong>Email :</strong> {{ $coordonnees->email }}</p>
+<p><strong>Téléphone :</strong> {{ $coordonnees->telephone }}</p>
+<p><strong>Code postal :</strong> {{ $coordonnees->code_postal }}</p>
+<p><strong>Ville :</strong> {{ $coordonnees->ville }}</p>
+<p><strong>Pays :</strong> {{ $coordonnees->pays }}</p>
         </div>
 
         {{-- Bouton modifier --}}
