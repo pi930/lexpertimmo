@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Message;
+use App\Models\Devis;
+use App\Models\Rendezvous;
+use App\Models\Coordonnee;
+use App\Services\RendezvousService;
 
 class UserController extends Controller
 {
