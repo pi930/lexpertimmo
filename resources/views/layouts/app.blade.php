@@ -9,8 +9,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-gray-50 text-gray-900">
-
+<body class="bg-blue-200 text-gray-900 min-h-screen">
     {{-- Bandeau tricolore --}}
     <div class="w-full flex h-2">
         <div class="flex-1 bg-blue-600"></div>

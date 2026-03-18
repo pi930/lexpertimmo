@@ -1,4 +1,4 @@
-<nav class="bg-white border-b border-gray-200 shadow-md">
+<nav class="bg-blue-300 border-b border-blue-400 shadow-md text-white">
     <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
 
         <!-- Zone utilisateur (connecté uniquement) -->
