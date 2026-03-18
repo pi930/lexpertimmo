@@ -263,6 +263,25 @@ return redirect()->route('dashboard')->with([
 ]);
 }
 
+public function download($id)
+{
+    $devis = Devis::findOrFail($id);
+
+    // Vérification de sécurité : seul le propriétaire peut télécharger
+    if (auth()->id() !== $devis->user_id) {
+        abort(403, "Accès non autorisé");
+    }
+
+    $path = storage_path('app/private/devis/' . $devis->pdf_path);
+
+    if (!file_exists($path)) {
+        abort(404, "Fichier PDF introuvable");
+    }
+
+    return response()->download($path, $devis->pdf_path, [
+        'Content-Type' => 'application/pdf'
+    ]);
+}
 private function calculerPrixOption(string $opt, string $typeBien, string $surface): int
 {
     return match($opt) {
