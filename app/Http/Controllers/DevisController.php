@@ -271,8 +271,8 @@ public function download($id)
 
     // Autorisation :
     // - Le propriétaire peut télécharger
-    // - L'admin peut télécharger tous les devis
-    if ($user->id !== $devis->user_id && $user->role !== 'admin') {
+    // - L'admin (Admin ou admin) peut télécharger tous les devis
+    if ($user->id !== $devis->user_id && strtolower($user->role) !== 'admin') {
         abort(403, "Accès non autorisé");
     }
 
@@ -286,6 +286,7 @@ public function download($id)
         'Content-Type' => 'application/pdf'
     ]);
 }
+
 private function calculerPrixOption(string $opt, string $typeBien, string $surface): int
 {
     return match($opt) {
