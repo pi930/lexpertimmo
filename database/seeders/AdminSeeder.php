@@ -25,7 +25,7 @@ User::updateOrCreate(
         'pays' => 'France',
         'phone' => '0000000000',
         'password' => Hash::make('Guetteur.Ap1624'),
-        'role' => 'Admin',
+        'role' => 'admin',
         'email_verified_at' => now(),
     ]
 );
