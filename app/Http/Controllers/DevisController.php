@@ -267,8 +267,12 @@ public function download($id)
 {
     $devis = Devis::findOrFail($id);
 
-    // Vérification de sécurité : seul le propriétaire peut télécharger
-    if (auth()->id() !== $devis->user_id) {
+    $user = auth()->user();
+
+    // Autorisation :
+    // - Le propriétaire peut télécharger
+    // - L'admin peut télécharger tous les devis
+    if ($user->id !== $devis->user_id && $user->role !== 'admin') {
         abort(403, "Accès non autorisé");
     }
 
