@@ -19,7 +19,7 @@
             </style>
         @endif
     </head>
-    <body class="bg-gradient-to-b from-blue-600 to-blue-900 text-white p-6 lg:p-8 min-h-screen flex flex-col">
+    <body class="bg-blue-100 dark:bg-[#0a0a0a] text-[#1b1b18] p-6 lg:p-8 min-h-screen flex flex-col">
   <header class="w-full max-w-full lg:max-w-4xl text-sm mb-6 not-has-[nav]:hidden">
  @if (Route::has('login'))
   <nav class="w-full">
