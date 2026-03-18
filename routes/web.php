@@ -97,7 +97,7 @@ Route::get('/admin/dashboard', [DashboardController::class, 'AdminDashboard'])
     ->name('admin.dashboard');
 
 // Dashboard Utilisateur
-Route::get('/user/{id}/dashboard', [DashboardController::class, 'showUserDashboard'])
+Route::get('/dashboard', [DashboardController::class, 'showUserDashboard'])
     ->middleware('auth')
     ->name('user.dashboard');
 

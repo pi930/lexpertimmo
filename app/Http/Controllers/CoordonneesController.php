@@ -72,6 +72,8 @@ public function update(Request $request, $id)
 
     $coordonnees->update($validated);
 
-    return redirect()->route('user.dashboard')->with('success', 'Coordonnées mises à jour.');
+    return redirect()->route('user.dashboard')
+    ->with('success', 'Coordonnées mises à jour.');
+
 }
 }
