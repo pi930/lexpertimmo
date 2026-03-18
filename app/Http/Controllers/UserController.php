@@ -30,16 +30,49 @@ class UserController extends Controller
 
     // Dashboard utilisateur (spécifique à un user)
     public function dashboardUser($id)
-    {
-        $user = User::findOrFail($id);
+{
+    $user = User::findOrFail($id);
 
-        // Ici tu charges tout ce qui concerne CE user
-        // ex: coordonnees, messages, devis, rendezvous, etc.
-        // $coordonnees = ...
-        // $messages = ...
-        // etc.
+    // Messages
+    $messages = Message::where('user_id', $user->id)
+        ->latest()
+        ->paginate(10);
 
-        return view('Admin.dashboard_user', compact('user'));
-    }
+    // Coordonnées
+    $coordonnees = $user->coordonnee ?? null;
+
+    // Devis
+    $devis = Devis::where('user_id', $user->id)
+        ->latest()
+        ->paginate(10);
+
+    // Rendez-vous
+    $rendezvous = Rendezvous::where('user_id', $user->id)
+        ->latest()
+        ->get();
+
+    // Admin ?
+    $admin = $user->role === 'Admin';
+
+    // Propositions RDV
+    $service = new RendezvousService();
+    $propositions = $service->genererPropositions(
+        $coordonnees->rue ?? '',
+        $coordonnees->code_postal ?? '',
+        $coordonnees->ville ?? 'Nice',
+        2
+    );
+
+    return view('Admin.dashboard_user', compact(
+        'user',
+        'messages',
+        'coordonnees',
+        'devis',
+        'rendezvous',
+        'admin',
+        'propositions'
+    ));
+}
+
 }
 
