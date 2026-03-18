@@ -146,42 +146,29 @@ public function AdminDashboard()
 public function dashboard($id)
 {
     $user = Auth::user();
-    
 
     if ($user->id != $id && $user->role !== 'Admin') {
         abort(403, 'Accès interdit.');
     }
 
-    return view('Admin.dashboard_user', ['user' => $user]);
-}
-public function dashboardRoute()
-{
-    $user = auth()->user();
-
-    $coordonnees = $user->coordonnees;
-    $messages = $user->messages()->latest()->paginate(10);
-    $devis = $user->role === 'Admin'
-        ? Devis::latest()->paginate(10)
-        : $user->devis()->latest()->paginate(10);
-
+    $messages = Message::where('user_id', $user->id)->latest()->paginate(10);
+    $coordonnees = $user->coordonnee ?? null;
+    $devis = Devis::where('user_id', $user->id)->latest()->paginate(10);
+    $rendezvous = Rendezvous::where('user_id', $user->id)->latest()->get();
     $admin = $user->role === 'Admin';
-    $notifications = app(NotificationController::class)->latest();
-    $rendezvous = Rendezvous::where('user_id', $user->id)
-    ->latest()
-    ->get();
 
-   
+    // ⚡ Toujours définir $propositions
+    $service = new RendezvousService();
+    $propositions = $service->genererPropositions(
+        $coordonnees->rue ?? '',
+        $coordonnees->code_postal ?? '',
+        $coordonnees->ville ?? 'Nice',
+        2
+    );
 
-    return view($user->dashboardView(), [
-        'user' => $user,
-        'coordonnees' => $coordonnees,
-        'messages' => $messages,
-        'devis' => $devis,
-        'admin' => $admin,
-        'latestNotifications' => $notifications,
-        'rendezvous' => $rendezvous,
-        
-
-    ]);
+    return view('Admin.dashboard_user', compact(
+        'user','messages','coordonnees','devis','rendezvous','admin','propositions'
+    ));
 }
+
 }
