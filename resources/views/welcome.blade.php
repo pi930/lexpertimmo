@@ -97,7 +97,6 @@
       <a href="{{ route('contact.public') }}">📞 Contact</a>
     @endauth
   </nav>
-@endif
 </header>
 
         <main class="w-full lg:max-w-4xl max-w-[335px] flex-1">
