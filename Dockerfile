@@ -31,6 +31,9 @@ RUN apt-get update && apt-get install -y \
 # Extensions PHP
 RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
+# Extensions PostgreSQL (OBLIGATOIRE)
+RUN docker-php-ext-install pdo_pgsql pgsql
+
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -43,7 +46,7 @@ COPY . .
 # Copier les assets buildés
 COPY --from=build-assets /app/public/build ./public/build
 
-# Base SQLite
+# Base SQLite (inutile mais ok)
 RUN mkdir -p database && touch database/database.sqlite
 
 # Dépendances PHP
@@ -65,4 +68,3 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 10000
 
 CMD ["/entrypoint.sh"]
-
