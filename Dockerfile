@@ -44,7 +44,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Copier les assets buildés
-COPY --from=build-assets /app/public/build ./public/build
+COPY --from=build-assets /app/public ./public
 
 # Base SQLite (inutile mais ok)
 RUN mkdir -p database && touch database/database.sqlite
