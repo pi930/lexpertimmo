@@ -15,7 +15,7 @@ RUN npm run build
 # -----------------------------
 # 2) PHP + Composer + Extensions
 # -----------------------------
-FROM php:8.2-fpm
+FROM php:8.2-fpm AS php-stage
 
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpq-dev libonig-dev libxml2-dev libzip-dev
@@ -37,12 +37,12 @@ RUN chmod -R 777 storage bootstrap/cache
 
 
 # -----------------------------
-# 3) Caddy (serveur HTTP)
+# 3) Caddy (serveur HTTP final)
 # -----------------------------
 FROM caddy:2.7.4
 
-COPY --from=php:8.2-fpm /usr/local/sbin/php-fpm /usr/local/sbin/php-fpm
-COPY --from=php:8.2-fpm /var/www/html /var/www/html
+COPY --from=php-stage /usr/local/sbin/php-fpm /usr/local/sbin/php-fpm
+COPY --from=php-stage /var/www/html /var/www/html
 
 COPY Caddyfile /etc/caddy/Caddyfile
 
