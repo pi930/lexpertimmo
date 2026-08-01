@@ -27,8 +27,10 @@ public function build()
         throw new \Exception("L'utilisateur lié au devis est introuvable.");
     }
 
-    // Récupère le chemin complet depuis le disk privé
     $pdfPath = Storage::disk('devis_private')->path($this->devis->pdf_path);
+
+    // URL ABSOLUE obligatoire pour mail::button
+    $dashboardUrl = route('user.dashboard', ['id' => $user->id], true);
 
     return $this->subject('Merci pour votre devis chez Lexpertimmobilier')
                 ->attach($pdfPath, [
@@ -36,15 +38,14 @@ public function build()
                     'mime' => 'application/pdf',
                 ])
                 ->markdown('emails.devis.cree')
+                ->text('emails.devis.cree_plain')
                 ->with([
                     'user' => $user,
                     'devis' => $this->devis,
                     'messagePerso' => "Bonjour {$user->nom}, merci pour votre demande. Vous trouverez ci-joint votre devis personnalisé.",
                     'dateDevis' => $this->devis->created_at->format('d/m/Y à H:i'),
-                    'dashboardUrl' => route(
-                        $user->role === 'Admin' ? 'Admin.dashboard_Admin' : 'user.dashboard',
-                        ['id' => $user->id]
-                    ),
+                    'dashboardUrl' => $dashboardUrl,
                 ]);
 }
+
 }

@@ -244,24 +244,25 @@ DevisLigne::create([
 
     // 6) Générer et sauvegarder le PDF
     // Assure-toi que storage/app/private/devis existe et que le disk 'devis_private' pointe dessus si tu l'utilises
-    $// Générer le PDF
+/// Générer le PDF
 $pdf = Pdf::loadView('devis.template', compact(
     'typeBien', 'surface', 'options', 'prixTotal', 'user', 'prestations'
 ));
 
 // Stocker le PDF en base64 dans la base
-$devis->pdf_path = $filename; // nom du fichier
-$devis->pdf_content = base64_encode($pdf->output()); // contenu PDF encodé
+$devis->pdf_path = $filename;
+$devis->pdf_content = base64_encode($pdf->output());
 $devis->save();
 
-// Envoyer l’email
-Mail::to($devis->email)->send(new DevisCree($devis));
+// ❌ SUPPRIMÉ : envoi d’email
+// Mail::to($devis->email)->send(new DevisCree($devis));
 
 // Redirection vers le dashboard
 return redirect()->route('dashboard')->with([
-    'success'    => '✅ Votre devis a été créé et envoyé !',
+    'success'    => '✅ Votre devis a été créé !',
     'devis_link' => route('devis.download', $devis->id),
 ]);
+
     }
 }
 
