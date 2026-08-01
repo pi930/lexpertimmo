@@ -9,6 +9,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
 RUN npm run build
 
 
@@ -17,54 +18,25 @@ RUN npm run build
 # -----------------------------
 FROM php:8.2-fpm
 
-# Dépendances système
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    zip \
-    unzip \
-    libpq-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev
+    git curl zip unzip libpq-dev libonig-dev libxml2-dev libzip-dev
 
-# Extensions PHP
 RUN docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
-
-# Extensions PostgreSQL (OBLIGATOIRE)
 RUN docker-php-ext-install pdo_pgsql pgsql
 
-# Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Dossier de travail
 WORKDIR /var/www/html
 
-# Copier le code Laravel
 COPY . .
 
-# Copier les assets buildés
 COPY --from=build-assets /app/public ./public
 
-# Base SQLite (inutile mais ok)
-RUN mkdir -p database && touch database/database.sqlite
-
-# Dépendances PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Dossiers Laravel
-RUN mkdir -p storage/framework/cache \
-    storage/framework/sessions \
-    storage/framework/views \
-    storage/logs
-
-# Permissions
-RUN chmod -R 777 storage bootstrap/cache database
-
-# Entrypoint
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs
+RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 10000
 
-CMD ["/entrypoint.sh"]
+CMD ["php-fpm"]
