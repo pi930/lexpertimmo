@@ -15,7 +15,7 @@ RUN npm run build
 # -----------------------------
 # 2) PHP + Composer + Extensions
 # -----------------------------
-FROM php:8.2-fpm AS php-stage
+FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpq-dev libonig-dev libxml2-dev libzip-dev
@@ -35,17 +35,6 @@ RUN composer install --no-dev --optimize-autoloader
 RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs
 RUN chmod -R 777 storage bootstrap/cache
 
-
-# -----------------------------
-# 3) Caddy (serveur HTTP final)
-# -----------------------------
-FROM caddy:2.7.4
-
-COPY --from=php-stage /usr/local/sbin/php-fpm /usr/local/sbin/php-fpm
-COPY --from=php-stage /var/www/html /var/www/html
-
-COPY Caddyfile /etc/caddy/Caddyfile
-
 EXPOSE 10000
 
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
