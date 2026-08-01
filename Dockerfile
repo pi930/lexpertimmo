@@ -9,12 +9,11 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-
 RUN npm run build
 
 
 # -----------------------------
-# 2) Image PHP pour Laravel
+# 2) PHP + Composer + Extensions
 # -----------------------------
 FROM php:8.2-fpm
 
@@ -29,7 +28,6 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 COPY . .
-
 COPY --from=build-assets /app/public ./public
 
 RUN composer install --no-dev --optimize-autoloader
@@ -37,6 +35,17 @@ RUN composer install --no-dev --optimize-autoloader
 RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs
 RUN chmod -R 777 storage bootstrap/cache
 
+
+# -----------------------------
+# 3) Caddy (serveur HTTP)
+# -----------------------------
+FROM caddy:2.7.4
+
+COPY --from=php:8.2-fpm /usr/local/sbin/php-fpm /usr/local/sbin/php-fpm
+COPY --from=php:8.2-fpm /var/www/html /var/www/html
+
+COPY Caddyfile /etc/caddy/Caddyfile
+
 EXPOSE 10000
 
-CMD ["php-fpm"]
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
