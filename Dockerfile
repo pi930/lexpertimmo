@@ -32,8 +32,15 @@ COPY --from=build-assets /app/public ./public
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN mkdir -p storage/framework/{cache,sessions,views} storage/logs
-RUN chmod -R 777 storage bootstrap/cache
+# Créer les dossiers nécessaires pour Laravel
+RUN mkdir -p storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs
+
+# Donner les permissions nécessaires
+RUN chmod -R 777 storage
+RUN chmod -R 777 bootstrap/cache
 
 EXPOSE 10000
 
